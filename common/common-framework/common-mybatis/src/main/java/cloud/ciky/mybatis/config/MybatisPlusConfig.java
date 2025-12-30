@@ -1,0 +1,77 @@
+package cloud.ciky.mybatis.config;
+
+import cloud.ciky.mybatis.handler.MyMetaObjectHandler;
+import cloud.ciky.mybatis.handler.typehandler.CommaStringListHandler;
+import cloud.ciky.mybatis.handler.typehandler.IntegerArrayJsonTypeHandler;
+import cloud.ciky.mybatis.handler.typehandler.LongArrayJsonTypeHandler;
+import cloud.ciky.mybatis.handler.typehandler.StringArrayJsonTypeHandler;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.List;
+
+/**
+ * <p>
+ * mybatis-plus 配置类
+ * </p>
+ *
+ * @author ciky
+ * @since 2025/12/9 15:00
+ */
+@Configuration
+@EnableTransactionManagement
+public class MybatisPlusConfig {
+
+//    @Bean
+//    public MyDataPermissionHandler myDataPermissionHandler(IDataScopeProvider dataScopeProvider){
+//        return new MyDataPermissionHandler(dataScopeProvider);
+//    }
+//
+//    /**
+//     * 分页插件和数据权限插件
+//     */
+//    @Bean
+//    public MybatisPlusInterceptor mybatisPlusInterceptor(MyDataPermissionHandler handler) {
+//        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+//
+//        //数据权限
+//        interceptor.addInnerInterceptor(new DataPermissionInterceptor(handler));
+//        //分页插件
+//        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+//        //乐观锁插件
+//        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+//        // 添加租户拦截器
+////        interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantHandler()));
+//
+//        return interceptor;
+//    }
+
+    @Bean
+    public ConfigurationCustomizer configurationCustomizer() {
+        return configuration -> {
+            // 全局注册自定义TypeHandler
+            TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+            typeHandlerRegistry.register(String[].class, JdbcType.OTHER, StringArrayJsonTypeHandler.class);
+            typeHandlerRegistry.register(Long[].class, JdbcType.OTHER, LongArrayJsonTypeHandler.class);
+            typeHandlerRegistry.register(Integer[].class, JdbcType.OTHER, IntegerArrayJsonTypeHandler.class);
+            // 将逗号分隔的字符串转换为List<String>的处理器
+            typeHandlerRegistry.register(List.class, JdbcType.VARCHAR, CommaStringListHandler.class);
+        };
+    }
+
+    /**
+     * 自动填充数据库创建人、创建时间、更新人、更新时间
+     */
+    @Bean
+    public GlobalConfig globalConfig() {
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.setMetaObjectHandler(new MyMetaObjectHandler());
+        return globalConfig;
+    }
+
+}

@@ -1,0 +1,2 @@
+cloud.ciky.file.service.impl.MinioOssService
+cloud.ciky.file.service.impl.AliyunOssService

@@ -1,0 +1,9 @@
+  cloud.ciky.core.config.WebMvcConfig
+  cloud.ciky.core.config.FeignConfig
+  cloud.ciky.core.exception.GlobalExceptionHandler
+  cloud.ciky.core.aspect.RepeatSubmitAspect
+  cloud.ciky.core.aspect.RateLimitAspect
+  cloud.ciky.core.aspect.RedisCacheAspect
+  cloud.ciky.core.config.OpenApiConfig
+  cloud.ciky.core.config.RestTemplateConfig
+

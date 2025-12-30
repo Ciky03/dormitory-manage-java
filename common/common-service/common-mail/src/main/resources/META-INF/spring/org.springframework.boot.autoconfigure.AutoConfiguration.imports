@@ -1,0 +1,2 @@
+  cloud.ciky.mail.config.MailConfig
+  cloud.ciky.mail.service.impl.MailServiceImpl

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cloud.ciky.system.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cloud.ciky.system.model.entity.SysUser">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="status" property="status" />
+        <result column="avatar" property="avatar" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="delflag" property="delflag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, phone, email, status, avatar, create_by, create_time, update_by, update_time, delflag
+    </sql>
+
+    <!-- 用户认证信息映射 -->
+    <resultMap id="UserAuthMap" type="cloud.ciky.system.model.dto.UserAuthDTO">
+        <id property="userId" column="id"/>
+        <result property="username" column="username"/>
+        <result property="realName" column="real_name"/>
+        <result property="password" column="password"/>
+        <result property="status" column="status"/>
+        <result property="nickname" column="nickname"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+
+        <collection property="roles" ofType="string" javaType="java.util.Set">
+            <result column="code"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="getUserAuthInfo" resultMap="UserAuthMap"
+            parameterType="java.lang.String">
+        select su.id,
+               su.username,
+               su.real_name,
+               su.password,
+               su.status,
+               su.nickname,
+               su.phone,
+               su.email,
+               r.code
+        from sys_user su
+                 left join sys_user_role ur on ur.user_id = su.id and ur.delflag = 0
+                 left join sys_role r on r.id = ur.role_id and r.delflag = 0
+        where su.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(authKey)">
+            and (su.username = #{authKey} or su.phone = #{authKey} or su.email = #{authKey} )
+        </if>
+    </select>
+    <select id="test" resultType="cloud.ciky.system.model.dto.UserAuthDTO" parameterType="java.lang.String">
+        select su.id,
+        su.username,
+        su.real_name,
+        su.password,
+        su.status,
+        su.nickname,
+        su.phone,
+        su.email,
+        r.code
+        from sys_user su
+        left join sys_user_role ur on ur.user_id = su.id and ur.delflag = 0
+        left join sys_role r on r.id = ur.role_id and r.delflag = 0
+        where su.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(authKey)">
+            and (su.username = #{authKey} or su.phone = #{authKey} or su.email = #{authKey} )
+        </if>
+    </select>
+
+</mapper>

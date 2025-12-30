@@ -1,0 +1,27 @@
+server:
+  port: 9991
+
+spring:
+  application:
+    name: auth
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    active: dev
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://192.168.65.128:8848
+        namespace: dormitory-manager-${spring.profiles.active}
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        namespace: dormitory-manager-${spring.profiles.active}
+        file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: common.yaml
+            refresh: true
