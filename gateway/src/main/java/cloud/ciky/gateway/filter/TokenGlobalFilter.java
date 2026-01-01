@@ -1,5 +1,6 @@
 package cloud.ciky.gateway.filter;
 
+import cloud.ciky.base.constant.JwtClaimConstants;
 import cloud.ciky.base.constant.RedisConstants;
 import cloud.ciky.base.result.ResultCode;
 import cloud.ciky.gateway.util.WebFluxUtils;
@@ -12,6 +13,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -54,6 +56,7 @@ public class TokenGlobalFilter implements GlobalFilter, Ordered {
             String token = authorization.substring(BEARER_PREFIX.length());
             JWSObject jwsObject = JWSObject.parse(token);
             String jti = String.valueOf(jwsObject.getPayload().toJSONObject().get(RegisteredPayload.JWT_ID));
+            String userId = String.valueOf(jwsObject.getPayload().toJSONObject().get(JwtClaimConstants.USER_ID));
 
             if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisConstants.Auth.BLACKLIST_TOKEN + jti))) {
                 return WebFluxUtils.writeErrorResponse(response, ResultCode.TOKEN_ACCESS_FORBIDDEN);
@@ -63,6 +66,11 @@ public class TokenGlobalFilter implements GlobalFilter, Ordered {
                 redisTemplate.expire(RedisConstants.Auth.REPEAT_TOKEN + jti, 10, TimeUnit.MINUTES);
                 return WebFluxUtils.writeErrorResponse(response, ResultCode.USER_ACCOUNT_OTHER_SITE_LOGIN);
             }
+
+            if (Boolean.FALSE.equals(redisTemplate.hasKey(RedisConstants.Auth.LOGIN_TOKEN + userId))) {
+                return WebFluxUtils.writeErrorResponse(response, ResultCode.USER_LOGOUT_AUTHORIZATION_ERROR);
+            }
+
         } catch (ParseException e) {
             log.error("在TokenValidationGlobalFilter中解析令牌失败 ", e);
             return WebFluxUtils.writeErrorResponse(response, ResultCode.TOKEN_INVALID);
