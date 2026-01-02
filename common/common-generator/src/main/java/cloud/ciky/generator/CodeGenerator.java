@@ -20,16 +20,16 @@ import java.util.Collections;
 public class CodeGenerator {
 
     // 服务名以及数据表名
-    private static final String SERVICE_NAME = "";
+    private static final String SERVICE_NAME = "system";
 
-    private static final String DATA_SOURCE_URL = "jdbc:mysql://192.168.65.128:3306/dm_system?characterEncoding=utf8&useSSL=false&userUnicode=true&serverTimezone=Asia/Shanghai";
+    private static final String DATA_SOURCE_URL = "jdbc:mysql://8.138.89.145:3306/dm_system?characterEncoding=utf8&useSSL=false&userUnicode=true&serverTimezone=Asia/Shanghai";
     //数据库账号
     private static final String DATA_SOURCE_USER_NAME = "root";
     //数据库密码
     private static final String DATA_SOURCE_PASSWORD = "190715zcy";
     //生成的表
     private static final String[] TABLE_NAMES = new String[]{
-                "sys_role", "sys_user_role"
+                "sys_menu"
     };
 
 
