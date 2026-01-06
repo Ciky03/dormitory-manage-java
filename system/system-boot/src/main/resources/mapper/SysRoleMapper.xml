@@ -23,4 +23,25 @@
         id, name, code, remark, sort, status, data_scope, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <select id="selectRoleList" resultType="cloud.ciky.system.model.vo.RolePageVO">
+    select r.id,
+           r.name,
+           r.code,
+           r.status,
+           r.remark,
+           r.sort
+    from sys_role r
+    where r.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (r.name like concat('%', #{query.keywords}, '%') or r.remark like concat('%', #{query.keywords}, '%'))
+        </if>
+        <if test="query.isAdmin != null and query.isAdmin == 0">
+            and r.code != '${@cloud.ciky.base.constant.SystemConstants@ADMIN_ROLE_CODE}'
+        </if>
+        <if test="query.status != null">
+            and r.status = #{query.status}
+        </if>
+    order by r.status desc, r.sort
+    </select>
+
 </mapper>

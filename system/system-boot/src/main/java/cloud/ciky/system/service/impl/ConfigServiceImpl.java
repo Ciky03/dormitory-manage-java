@@ -2,6 +2,7 @@ package cloud.ciky.system.service.impl;
 
 import cloud.ciky.system.service.ConfigService;
 import cloud.ciky.system.service.SysMenuService;
+import cloud.ciky.system.service.SysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,14 @@ import org.springframework.stereotype.Service;
 public class ConfigServiceImpl implements ConfigService {
 
     private final SysMenuService menuService;
+    private final SysRoleService roleService;
 
     @Override
     public Long getSort(String business, String parentId) {
 
         return switch (business) {
             case "menu" -> menuService.getSort(parentId);
+            case "role" -> roleService.getSort();
             default -> 1L;
         };
     }

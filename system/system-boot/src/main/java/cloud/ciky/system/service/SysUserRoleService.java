@@ -26,4 +26,16 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      * @return java.util.List<java.lang.String>
      */
     List<String> findRoleCodesByUserId(String userId);
+
+    /**
+     * <p>
+     * 判断角色是否存在绑定的用户
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/4 18:15
+     * @param roleId 角色id
+     * @return boolean
+     */
+    boolean hasAssignedUsers(String roleId);
 }

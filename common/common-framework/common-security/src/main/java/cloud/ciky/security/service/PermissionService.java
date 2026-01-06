@@ -41,7 +41,7 @@ public class PermissionService {
             return false;
         }
         // 超级管理员放行
-        if (SecurityUtils.isRoot()) {
+        if (SecurityUtils.isAdmin()) {
             return true;
         }
 

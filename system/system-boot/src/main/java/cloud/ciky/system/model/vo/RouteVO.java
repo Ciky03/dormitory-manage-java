@@ -24,6 +24,9 @@ public class RouteVO {
     @Schema(description = "父菜单id")
     private String parentId;
 
+    @Schema(description = "菜单类型（1-菜单 2-目录 3-外链 4-按钮）")
+    private Integer type;
+
     @Schema(description = "路由title")
     private String name;
 

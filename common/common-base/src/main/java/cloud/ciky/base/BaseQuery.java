@@ -32,9 +32,6 @@ public class BaseQuery extends BasePageQuery {
     @Schema(description = "结束日期")
     private String endDate;
 
-    @Schema(description = "项目ID")
-    private String proId;
-
     @Schema(description = "用户id")
     private String userId;
 

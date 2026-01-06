@@ -24,5 +24,16 @@
                  join sys_role r on ur.role_id = r.id
         where ur.user_id = #{userId}
     </select>
+    <select id="countUsersForRole" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            sys_user_role ur
+                inner join sys_role r on ur.role_id = r.id and r.delflag = 0
+                inner join sys_user u on ur.user_id = u.id  and u.delflag = 0
+        where
+            ur.delflag = 0
+            and ur.role_id = #{roleId}
+    </select>
 
 </mapper>

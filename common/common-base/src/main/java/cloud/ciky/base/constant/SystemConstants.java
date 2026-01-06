@@ -20,25 +20,12 @@ public interface SystemConstants {
     /**
      * 系统默认密码
      */
-    String DEFAULT_PASSWORD = "Zd@123456#$";
+    String DEFAULT_PASSWORD = "DM@123456";
 
     /**
      * 超级管理员角色编码
      */
-    String ROOT_ROLE_CODE = "ROOT";
-    /**
-     * 默认平台角色编码
-     */
-    String PLATFORM_ROLE_CODE = "PLATFORM";
-    /**
-     * 供应商平台角色编码
-     */
-    String SUPPLIER_ROLE_CODE = "SUPPLIER";
-
-    /**
-     * 加工厂租户编码
-     */
-    String TENANT_JGC_CODE = "ZDSB";
+    String ADMIN_ROLE_CODE = "ADMIN";
 
     /**
      * 文档管理员角色编码

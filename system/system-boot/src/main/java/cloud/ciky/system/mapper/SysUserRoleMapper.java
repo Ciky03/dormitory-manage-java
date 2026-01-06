@@ -20,4 +20,16 @@ public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
 
     @InterceptorIgnore(dataPermission = "true")
     List<String> findRoleCodesByUserId(String userId);
+
+    /**
+     * <p>
+     * 获取角色绑定的用户数
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/4 18:16
+     * @param roleId 角色id
+     * @return boolean
+     */
+    int countUsersForRole(String roleId);
 }

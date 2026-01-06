@@ -27,4 +27,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
     public List<String> findRoleCodesByUserId(String userId) {
         return this.baseMapper.findRoleCodesByUserId(userId);
     }
+
+    @Override
+    public boolean hasAssignedUsers(String roleId) {
+        return this.baseMapper.countUsersForRole(roleId) > 0;
+    }
 }

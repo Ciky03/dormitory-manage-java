@@ -33,6 +33,7 @@
     <select id="listRoutes" resultType="cloud.ciky.system.model.vo.RouteVO">
         select
             m.id,
+            m.type,
             m.parent_id,
             m.name,
             m.route_name,

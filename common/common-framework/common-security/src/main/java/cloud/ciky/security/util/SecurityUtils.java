@@ -99,9 +99,9 @@ public class SecurityUtils {
         return null;
     }
 
-    public static boolean isRoot() {
+    public static boolean isAdmin() {
         Set<String> roles = getRoles();
-        return roles != null && roles.contains(SystemConstants.ROOT_ROLE_CODE);
+        return roles != null && roles.contains(SystemConstants.ADMIN_ROLE_CODE);
     }
 
     public static boolean isDocAdmin(){
