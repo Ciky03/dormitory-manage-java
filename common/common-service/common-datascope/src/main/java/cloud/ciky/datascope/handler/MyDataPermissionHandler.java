@@ -74,7 +74,6 @@ public class MyDataPermissionHandler implements DataPermissionHandler {
     private Expression buildScopeExpression(DataScope ds, String mainAlias) {
         if (ds == null || ds.getType() == null) return denyAll();
 
-        //TODO 通过原sql获取主表别名, 设置column为xxx.column
         return switch (ds.getType()) {
             case ALL -> null; // 不加条件
             case NONE -> denyAll();

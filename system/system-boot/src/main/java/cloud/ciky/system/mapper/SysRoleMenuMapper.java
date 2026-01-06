@@ -1,5 +1,6 @@
 package cloud.ciky.system.mapper;
 
+import cloud.ciky.system.model.bo.RolePermsBO;
 import cloud.ciky.system.model.entity.SysRoleMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +29,16 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
      * @return java.util.List<java.lang.String>
      */
     List<String> selectMenuIdsByRoleId(String roleId);
+
+    /**
+     * <p>
+     * 获取权限和拥有权限的角色列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 15:55
+     * @param roleCode 角色code
+     * @return java.util.List<cloud.ciky.system.model.bo.RolePermsBO>
+     */
+    List<RolePermsBO> selectRolePermsList(String roleCode);
 }

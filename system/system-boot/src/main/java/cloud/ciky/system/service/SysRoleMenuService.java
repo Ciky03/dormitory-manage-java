@@ -27,4 +27,36 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      */
     List<String> listMenuIdsByRoleId(String roleId);
 
+    /**
+     * <p>
+     * 刷新权限缓存(所有角色)
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 15:46
+     */
+    void refreshRolePermsCache();
+
+    /**
+     * <p>
+     * 刷新权限缓存(指定角色)
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:04
+     * @param roleCode 角色编码
+     */
+    void refreshRolePermsCache(String roleCode);
+
+    /**
+     * <p>
+     * 刷新权限缓存(修改角色编码时调用)
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:03
+     * @param oldRoleCode 旧角色编码
+     * @param newRoleCode 新角色编码
+     */
+    void refreshRolePermsCache(String oldRoleCode, String newRoleCode);
 }

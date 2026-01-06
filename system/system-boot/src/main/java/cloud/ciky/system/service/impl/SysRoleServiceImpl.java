@@ -127,12 +127,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         entity.setDataScope(roleForm.getDataScope());
         String roleCode = entity.getCode();
         boolean result = this.saveOrUpdate(entity);
-        // TODO 判断角色编码是否修改，修改了则刷新权限缓存
-//        if (result
-//                && (oldRole != null
-//                && (!CharSequenceUtil.equals(oldRole.getCode(), roleCode)))) {
-//            roleMenuService.refreshRolePermsCache(oldRole.getCode(), roleCode);
-//        }
+        // 判断角色编码是否修改，修改了则刷新权限缓存
+        if (result
+                && (oldRole != null
+                && (!CharSequenceUtil.equals(oldRole.getCode(), roleCode)))) {
+            roleMenuService.refreshRolePermsCache(oldRole.getCode(), roleCode);
+        }
         return result;
     }
 
@@ -165,10 +165,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         boolean result = this.update(wrapper);
 
-        // TODO 刷新角色的权限缓存
-//        if (result) {
-//            roleMenuService.refreshRolePermsCache(role.getCode());
-//        }
+        // 刷新角色的权限缓存
+        if (result) {
+            roleMenuService.refreshRolePermsCache(role.getCode());
+        }
         return result;
     }
 
@@ -201,10 +201,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             // 删除角色菜单关联
             roleMenuService.remove(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, roleId));
 
-            // TODO 删除成功，刷新权限缓存
-//            if (result) {
-//                roleMenuService.refreshRolePermsCache(role.getCode());
-//            }
+            //  删除成功，刷新权限缓存
+            if (result) {
+                roleMenuService.refreshRolePermsCache(role.getCode());
+            }
         }
         return true;
     }
@@ -241,8 +241,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                     .toList();
             roleMenuService.saveBatch(roleMenus);
         }
-        // TODO 刷新角色的权限缓存
-//        roleMenuService.refreshRolePermsCache(role.getCode());
+        //  刷新角色的权限缓存
+        roleMenuService.refreshRolePermsCache(role.getCode());
 
         return true;
     }

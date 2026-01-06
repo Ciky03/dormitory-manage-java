@@ -14,6 +14,7 @@ import cloud.ciky.system.model.form.MenuForm;
 import cloud.ciky.system.model.vo.MenuVO;
 import cloud.ciky.system.model.vo.RouteVO;
 import cloud.ciky.system.service.SysMenuService;
+import cloud.ciky.system.service.SysRoleMenuService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONUtil;
@@ -22,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,10 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
+
+    private final SysRoleMenuService roleMenuService;
 
     @Override
     public List<MenuVO> listMenus() {
@@ -278,11 +283,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
 
         boolean result = this.saveOrUpdate(entity);
-        //TODO 编辑刷新角色权限缓存
-//        if (result && menuForm.getId() != null) {
-//            roleMenuService.refreshRolePermsCache();
-//            deptMenuService.refreshDeptPermsCache();
-//        }
+        // 编辑刷新角色权限缓存
+        if (result && menuForm.getId() != null) {
+            roleMenuService.refreshRolePermsCache();
+        }
         // 修改菜单如果有子菜单，则更新子菜单的树路径
         updateChildrenTreePath(entity.getId(), treePath);
         return result;
@@ -364,9 +368,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
             boolean removed = this.removeById(menuId);
         }
-        // TODO 刷新角色权限缓存
-//        roleMenuService.refreshRolePermsCache();
-//        deptMenuService.refreshDeptPermsCache();
+        //  刷新角色权限缓存
+        roleMenuService.refreshRolePermsCache();
         return true;
     }
 
