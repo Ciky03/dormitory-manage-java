@@ -3,6 +3,7 @@ package cloud.ciky.system.mapper;
 import cloud.ciky.core.annotation.DataPermission;
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysUser;
+import cloud.ciky.system.model.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -32,4 +33,16 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
     @DataPermission(mainAlias = "su")
     UserAuthDTO test(String authKey);
+
+    /**
+     * <p>
+     * 获取用户登录信息
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:47
+     * @param userId 用户id
+     * @return cloud.ciky.system.model.vo.UserInfoVO
+     */
+    UserInfoVO getUserInfo(String userId);
 }

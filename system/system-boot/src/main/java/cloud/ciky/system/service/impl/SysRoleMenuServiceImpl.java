@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -83,5 +85,14 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
             Set<String> perms = rolePerms.getPerms();
             redisTemplate.opsForHash().put(RedisConstants.System.ROLE_PERMS, newRoleCode, perms);
         }
+    }
+
+    @Override
+    public Set<String> listPermByRoleIds(Set<String> roles) {
+        List<String> perms = this.baseMapper.selectPermByRoles(roles);
+        if (CollUtil.isEmpty(perms)) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(perms);
     }
 }

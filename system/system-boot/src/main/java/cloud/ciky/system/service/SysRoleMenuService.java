@@ -4,6 +4,7 @@ import cloud.ciky.system.model.entity.SysRoleMenu;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -59,4 +60,16 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      * @param newRoleCode 新角色编码
      */
     void refreshRolePermsCache(String oldRoleCode, String newRoleCode);
+
+    /**
+     * <p>
+     * 获取角色权限集合
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:40
+     * @param roles 角色编码集合
+     * @return java.util.Set<java.lang.String>
+     */
+    Set<String> listPermByRoleIds(Set<String> roles);
 }

@@ -2,6 +2,7 @@ package cloud.ciky.system.controller;
 
 import cloud.ciky.base.result.Result;
 import cloud.ciky.system.model.dto.UserAuthDTO;
+import cloud.ciky.system.model.vo.UserInfoVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,13 @@ public class UserController {
     public Result<String> test(){
         String result = userService.test();
         return Result.success(result);
+    }
+
+    @Operation(summary = "获取登录用户信息")
+    @GetMapping("/current")
+    public Result<UserInfoVO> getCurrentUserInfo() {
+        UserInfoVO userInfoVO = userService.getCurrentUserInfo();
+        return Result.success(userInfoVO);
     }
 
 }

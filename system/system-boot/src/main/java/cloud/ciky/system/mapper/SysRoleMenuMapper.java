@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -41,4 +42,16 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
      * @return java.util.List<cloud.ciky.system.model.bo.RolePermsBO>
      */
     List<RolePermsBO> selectRolePermsList(String roleCode);
+
+    /**
+     * <p>
+     * 获取角色权限集合
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:40
+     * @param roles 角色编码集合
+     * @return java.util.List<java.lang.String>
+     */
+    List<String> selectPermByRoles(Set<String> roles);
 }

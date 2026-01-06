@@ -2,6 +2,7 @@ package cloud.ciky.system.service;
 
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysUser;
+import cloud.ciky.system.model.vo.UserInfoVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -27,4 +28,16 @@ public interface SysUserService extends IService<SysUser> {
     UserAuthDTO getUserAuthInfo(String authKey);
 
     String test();
+
+    /**
+     * <p>
+     * 获取登录用户信息
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/6 16:34
+     * @return cloud.ciky.system.model.vo.UserInfoVO
+     */
+    UserInfoVO getCurrentUserInfo();
+
 }

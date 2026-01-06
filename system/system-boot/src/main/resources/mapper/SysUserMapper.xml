@@ -79,4 +79,14 @@
         </if>
     </select>
 
+    <!--获取用户登录信息-->
+    <select id="getUserInfo" resultType="cloud.ciky.system.model.vo.UserInfoVO">
+        select
+            su.id,
+            su.real_name,
+            su.avatar
+        from sys_user su
+        where su.id = #{userId}
+    </select>
+
 </mapper>
