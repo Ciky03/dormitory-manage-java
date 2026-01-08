@@ -1,24 +1,44 @@
 package cloud.ciky.system.service.impl;
 
+import cloud.ciky.base.BaseQuery;
 import cloud.ciky.base.exception.BusinessException;
+import cloud.ciky.base.model.Option;
+import cloud.ciky.mail.service.MailService;
 import cloud.ciky.security.service.PermissionService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysUser;
 import cloud.ciky.system.mapper.SysUserMapper;
+import cloud.ciky.system.model.entity.SysUserRole;
+import cloud.ciky.system.model.form.PwdUpdateForm;
+import cloud.ciky.system.model.form.UserForm;
+import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
 import cloud.ciky.system.service.SysRoleMenuService;
+import cloud.ciky.system.service.SysUserRoleService;
 import cloud.ciky.system.service.SysUserService;
+import cloud.ciky.system.util.PasswordGenerator;
 import cn.hutool.core.annotation.scanner.FieldAnnotationScanner;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.extra.pinyin.PinyinUtil;
+import cn.hutool.extra.template.Template;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>
@@ -35,17 +55,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private final PermissionService permissionService;
     private final SysRoleMenuService roleMenuService;
+    private final PasswordEncoder passwordEncoder;
+    private final SysUserRoleService userRoleService;
+    private final MailService mailService;
 
     @Override
     public UserAuthDTO getUserAuthInfo(String authKey) {
         UserAuthDTO userAuthDto = this.baseMapper.getUserAuthInfo(authKey);
         return userAuthDto;
-    }
-
-    @Override
-    public String test() {
-        UserAuthDTO user = this.baseMapper.test("ciky");
-        return user.getRealName();
     }
 
     @Override
@@ -77,5 +94,206 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userInfoVO.setPerms(perms);
 
         return userInfoVO;
+    }
+
+    @Override
+    public Page<UserPageVO> getUserListPage(BaseQuery query) {
+        return this.baseMapper.selectUserListPage(new Page<>(query.getPageNum(), query.getPageSize()), query);
+    }
+
+    @Override
+    public List<Option<String>> listUserOptions() {
+        return null;
+    }
+
+    @Override
+    public UserForm getUserForm(String userId) {
+        UserForm user = this.baseMapper.getUserForm(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在!");
+        }
+        return user;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String saveUser(UserForm formData) {
+        String id = formData.getId();
+        String username = formData.getUsername();
+        String phone = formData.getPhone();
+        String email = formData.getEmail();
+        String optUser = SecurityUtils.getUserId();
+        String password = formData.getPassword();
+        String realName = formData.getRealName();
+        boolean userIdExisted = CharSequenceUtil.isNotBlank(id);
+
+        // 判断密码
+        if (CharSequenceUtil.isNotBlank(password)) {
+            if (!password.equals(formData.getConfirmPassword())) {
+                throw new BusinessException("密码不一致，请重新输入！");
+            }
+        }
+
+        // 判断用户名
+        boolean usernameExisted = this.exists(new LambdaQueryWrapper<SysUser>()
+                .ne(userIdExisted, SysUser::getId, id).eq(SysUser::getUsername, username));
+        if (usernameExisted) {
+            throw new BusinessException("用户名已存在，请修改后重试！");
+        }
+
+        // 判断手机号
+        if (!Validator.isMobile(phone)) {
+            throw new BusinessException("手机号码不正确!");
+        }
+        boolean phoneExisted = this.exists(new LambdaQueryWrapper<SysUser>()
+                .ne(userIdExisted, SysUser::getId, id).eq(SysUser::getPhone, phone));
+        if (phoneExisted) {
+            throw new BusinessException("手机号已存在，请修改后重试！");
+        }
+
+        // 判断邮箱
+        if (!Validator.isEmail(email)) {
+            throw new BusinessException("邮箱格式不正确!");
+        }
+        boolean emailExisted = this.exists(new LambdaQueryWrapper<SysUser>()
+                .ne(userIdExisted, SysUser::getId, id).eq(SysUser::getEmail, email));
+        if (emailExisted) {
+            throw new BusinessException("邮箱已存在，请修改后重试！");
+        }
+
+        SysUser entity = new SysUser();
+        if (userIdExisted) {
+            entity.setId(id);
+            entity.setUpdateBy(optUser);
+        } else {
+            entity.setCreateBy(optUser);
+        }
+
+        if (CharSequenceUtil.isNotBlank(password)) {
+            entity.setPassword(passwordEncoder.encode(password));
+        }
+        entity.setUsername(formData.getUsername());
+        if (CharSequenceUtil.isNotBlank(realName)) {
+            entity.setNickname(PinyinUtil.getPinyin(realName));
+            entity.setRealName(realName);
+        }
+        entity.setPhone(formData.getPhone());
+        entity.setEmail(formData.getEmail());
+        entity.setStatus(true);
+        boolean result = this.saveOrUpdate(entity);
+
+        // 保存用户角色
+        if (result) {
+            userRoleService.saveUserRoles(entity.getId(), formData.getRoleIds());
+        }
+        return entity.getId();
+    }
+
+    @Override
+    public boolean updateUserStatus(String userId, Boolean status) {
+        SysUser user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (user.getStatus().equals(status)) {
+            throw new BusinessException("用户状态未发生变化");
+        }
+
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getStatus, status)
+                .set(SysUser::getUpdateBy, SecurityUtils.getUserId())
+                .eq(SysUser::getId, userId);
+
+        return this.update(wrapper);
+    }
+
+    @Override
+    public boolean deleteUsers(String ids) {
+        if (CharSequenceUtil.isBlank(ids)) {
+            return false;
+        }
+        List<String> userIds = Arrays.stream(ids.split(",")).toList();
+        for (String userId : userIds) {
+            SysUser user = this.getById(userId);
+            if (user == null) {
+                continue;
+            }
+            // 删除用户
+            boolean removed = this.removeById(userId);
+
+            // 删除用户角色
+            if (removed) {
+                userRoleService.remove(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
+            }
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String resetPassword(String userId) {
+        SysUser entity = this.getById(userId);
+        if (entity == null) {
+            throw new BusinessException("用户不存在");
+        }
+        String email = entity.getEmail();
+        String newPwd = PasswordGenerator.generatePassword();
+        String realName = entity.getRealName();
+        if (CharSequenceUtil.isNotBlank(email)) {
+            if (Validator.isEmail(email)) {
+                // 创建模板配置
+                TemplateConfig config = new TemplateConfig("templates", TemplateConfig.ResourceMode.CLASSPATH);
+                // 获取模板引擎
+                TemplateEngine engine = TemplateUtil.createEngine(config);
+                // 获取模板
+                Template template = engine.getTemplate("resetPwd.ftl");
+                // 准备数据
+                Map<String, Object> data = new HashMap<>();
+
+                data.put("newPwd", newPwd);
+                data.put("realName", realName);
+                // 渲染模板
+                String render = template.render(data);
+                mailService.sendHtmlMail(email, "密码重置提醒（重要）", render);
+            }
+        }
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getPassword, passwordEncoder.encode(newPwd))
+                .set(SysUser::getUpdateBy, SecurityUtils.getUserId())
+                .eq(SysUser::getId, userId);
+
+        this.update(wrapper);
+        return newPwd;
+    }
+
+    @Override
+    public boolean changePassword(String userId, PwdUpdateForm form) {
+        String optUser = SecurityUtils.getUserId();
+        SysUser user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        String oldPassword = form.getOldPassword();
+        String newPassword = form.getNewPassword();
+        String confirmPassword = form.getConfirmPassword();
+
+        if (!newPassword.equals(confirmPassword)) {
+            throw new BusinessException("密码不一致，请重新输入！");
+        }
+        // 校验原密码
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BusinessException("原密码错误");
+        }
+        // 新旧密码不能相同
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new BusinessException("新密码不能与原密码相同");
+        }
+
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getPassword, passwordEncoder.encode(newPassword))
+                .set(SysUser::getUpdateBy, optUser)
+                .eq(SysUser::getId, userId);
+
+        return this.update(wrapper);
     }
 }

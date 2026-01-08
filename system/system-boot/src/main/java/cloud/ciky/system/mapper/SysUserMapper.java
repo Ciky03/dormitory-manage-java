@@ -1,10 +1,14 @@
 package cloud.ciky.system.mapper;
 
+import cloud.ciky.base.BaseQuery;
 import cloud.ciky.core.annotation.DataPermission;
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysUser;
+import cloud.ciky.system.model.form.UserForm;
+import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -31,9 +35,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 //    @DataPermission
     UserAuthDTO getUserAuthInfo(String authKey);
 
-    @DataPermission(mainAlias = "su")
-    UserAuthDTO test(String authKey);
-
     /**
      * <p>
      * 获取用户登录信息
@@ -45,4 +46,29 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return cloud.ciky.system.model.vo.UserInfoVO
      */
     UserInfoVO getUserInfo(String userId);
+
+    /**
+     * <p>
+     * 查询用户分页列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:51
+     * @param objectPage 分页对象
+     * @param query 查询对象
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.system.model.query.UserPageVO>
+     */
+    Page<UserPageVO> selectUserListPage(Page<Object> objectPage, BaseQuery query);
+
+    /**
+     * <p>
+     * 获取用户表单数据
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 15:12
+     * @param userId 用户id
+     * @return cloud.ciky.system.model.form.UserForm
+     */
+    UserForm getUserForm(String userId);
 }

@@ -38,4 +38,17 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      * @return boolean
      */
     boolean hasAssignedUsers(String roleId);
+
+    /**
+     * <p>
+     * 保存用户角色信息
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 15:54
+     * @param userId 用户id
+     * @param roleIds 角色id列表
+     * @return boolean
+     */
+    boolean saveUserRoles(String userId, List<String> roleIds);
 }

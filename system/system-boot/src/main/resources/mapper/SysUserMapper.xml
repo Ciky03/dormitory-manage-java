@@ -60,24 +60,6 @@
             and (su.username = #{authKey} or su.phone = #{authKey} or su.email = #{authKey} )
         </if>
     </select>
-    <select id="test" resultType="cloud.ciky.system.model.dto.UserAuthDTO" parameterType="java.lang.String">
-        select su.id,
-        su.username,
-        su.real_name,
-        su.password,
-        su.status,
-        su.nickname,
-        su.phone,
-        su.email,
-        r.code
-        from sys_user su
-        left join sys_user_role ur on ur.user_id = su.id and ur.delflag = 0
-        left join sys_role r on r.id = ur.role_id and r.delflag = 0
-        where su.delflag = 0
-        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(authKey)">
-            and (su.username = #{authKey} or su.phone = #{authKey} or su.email = #{authKey} )
-        </if>
-    </select>
 
     <!--获取用户登录信息-->
     <select id="getUserInfo" resultType="cloud.ciky.system.model.vo.UserInfoVO">
@@ -87,6 +69,63 @@
             su.avatar
         from sys_user su
         where su.id = #{userId}
+    </select>
+
+    <!--查询用户分页列表-->
+    <select id="selectUserListPage" resultType="cloud.ciky.system.model.query.UserPageVO">
+        select
+            su.id,
+            su.username,
+            su.real_name,
+            su.phone,
+            su.email,
+            su.status,
+            group_concat(r.name order by r.sort separator ',') as roleNames,
+            su.create_time
+        from sys_user su
+            left join sys_user_role ur on ur.user_id = su.id and ur.delflag = 0
+            left join sys_role r on r.id = ur.role_id and r.delflag = 0
+        where su.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (
+            su.username like concat('%',#{query.keywords},'%')
+            or su.real_name like concat('%',#{query.keywords},'%')
+            or su.phone like concat('%',#{query.keywords},'%')
+            )
+        </if>
+        <if test='query.status != null'>
+            and su.status = #{query.status}
+        </if>
+        group by su.id, su.username, su.real_name, su.username, su.phone, su.email, su.status, su.create_time
+        order by su.status desc, su.create_time asc
+    </select>
+
+    <!--用户表单信息映射-->
+    <resultMap id="UserFormMap" type="cloud.ciky.system.model.form.UserForm">
+        <id property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+
+        <collection property="roleIds" column="id" ofType="string" javaType="java.util.List"
+                    select="cloud.ciky.system.mapper.SysUserRoleMapper.selectRoleIdsByUserId">
+        </collection>
+    </resultMap>
+
+    <!--获取用户表单数据-->
+    <select id="getUserForm" resultMap="UserFormMap"
+            parameterType="java.lang.String">
+        select
+            su.id,
+            su.username,
+            su.nickname,
+            su.real_name,
+            su.phone,
+            su.email
+        from sys_user su
+        where su.delflag = 0
+        and su.id = #{userId}
     </select>
 
 </mapper>

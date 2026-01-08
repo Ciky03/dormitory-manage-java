@@ -1,9 +1,17 @@
 package cloud.ciky.system.service;
 
+import cloud.ciky.base.BaseQuery;
+import cloud.ciky.base.model.Option;
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysUser;
+import cloud.ciky.system.model.form.PwdUpdateForm;
+import cloud.ciky.system.model.form.UserForm;
+import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -27,8 +35,6 @@ public interface SysUserService extends IService<SysUser> {
      */
     UserAuthDTO getUserAuthInfo(String authKey);
 
-    String test();
-
     /**
      * <p>
      * 获取登录用户信息
@@ -40,4 +46,100 @@ public interface SysUserService extends IService<SysUser> {
      */
     UserInfoVO getCurrentUserInfo();
 
+    /**
+     * <p>
+     * 获取用户分页列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:43
+     * @param query 查询对象
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.system.model.query.UserPageVO>
+     */
+    Page<UserPageVO> getUserListPage(BaseQuery query);
+
+    /**
+     * <p>
+     * 用户下拉选项
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:45
+     * @return java.util.List<cloud.ciky.base.model.Option<java.lang.String>>
+     */
+    List<Option<String>> listUserOptions();
+
+    /**
+     * <p>
+     * 获取用户表单数据
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:47
+     * @param userId 用户id
+     * @return cloud.ciky.system.model.form.UserForm
+     */
+    UserForm getUserForm(String userId);
+
+    /**
+     * <p>
+     * 保存用户
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:47
+     * @param userForm 表单对象
+     * @return java.lang.String
+     */
+    String saveUser(UserForm userForm);
+
+    /**
+     * <p>
+     * 修改用户状态
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:47
+     * @param userId 用户id
+     * @param status 用户状态(1:启用;0:禁用)
+     * @return boolean
+     */
+    boolean updateUserStatus(String userId, Boolean status);
+
+    /**
+     * <p>
+     * 删除用户
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:48
+     * @param ids 用户id
+     * @return boolean
+     */
+    boolean deleteUsers(String ids);
+
+    /**
+     * <p>
+     * 重置用户密码
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/7 14:48
+     * @param userId 用户id
+     * @return java.lang.String
+     */
+    String resetPassword(String userId);
+
+    /**
+     * <p>
+     * 修改密码
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/8 16:56
+     * @param userId 用户id
+     * @param form 表单对象
+     * @return boolean
+     */
+    boolean changePassword(String userId, PwdUpdateForm form);
 }
