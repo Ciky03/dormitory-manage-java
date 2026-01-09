@@ -1,5 +1,7 @@
 package cloud.ciky.base.constant;
 
+import java.util.function.IntFunction;
+
 /**
  * Redis 常量
  *
@@ -38,6 +40,13 @@ public interface RedisConstants {
         String ROLE_PERMS = "system:role:perms"; // 系统角色和权限映射
         String DEPT_PERMS = "system:dept:perms"; // 系统部门和权限映射
         String DEPT_PATH = "system:dept:path";   //系统部门路径
+    }
+
+    /**
+     * 附件URL
+     */
+    interface Attach{
+        String AVATAR = "attach:url:avatar:";   // 头像附件
     }
 
 

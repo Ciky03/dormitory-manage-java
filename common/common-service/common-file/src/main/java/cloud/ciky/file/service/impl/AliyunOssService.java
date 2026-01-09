@@ -3,6 +3,7 @@ package cloud.ciky.file.service.impl;
 import cloud.ciky.base.constant.DateFormatConstants;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.file.model.dto.FileDTO;
+import cloud.ciky.file.model.dto.TempUrlDTO;
 import cloud.ciky.file.service.OssService;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -116,6 +117,11 @@ public class AliyunOssService implements OssService {
 
     @Override
     public FileDTO mergeChunk(String fileMd5, String fileName, Integer totalChunk, String bucket) {
+        return null;
+    }
+
+    @Override
+    public String getTempUrl(TempUrlDTO dto) {
         return null;
     }
 }

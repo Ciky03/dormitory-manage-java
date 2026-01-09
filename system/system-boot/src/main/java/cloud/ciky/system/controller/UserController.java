@@ -157,4 +157,16 @@ public class UserController {
         return Result.judge(result);
     }
 
+    @Operation(summary = "修改头像")
+    @Log(value = "修改头像", module = LogModuleEnum.USER)
+    @PutMapping(value = "/avatar/edit")
+    @RepeatSubmit
+    public Result<String> updateAvatar(
+            @Validated @RequestParam String attachId
+    ) {
+        String optUser = SecurityUtils.getUserId();
+        boolean result = userService.changeAvatar(optUser, attachId);
+        return Result.judge(result);
+    }
+
 }

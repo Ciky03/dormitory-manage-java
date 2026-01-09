@@ -2,6 +2,7 @@ package cloud.ciky.file.service;
 
 
 import cloud.ciky.file.model.dto.FileDTO;
+import cloud.ciky.file.model.dto.TempUrlDTO;
 import cloud.ciky.file.model.vo.FileVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,4 +82,15 @@ public interface OssService {
      */
     FileDTO mergeChunk(String fileMd5, String fileName, Integer totalChunk, String bucket);
 
+    /**
+     * <p>
+     * 获取文件临时url
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/9 15:08
+     * @param dto 信息对象
+     * @return java.lang.String
+     */
+    String getTempUrl(TempUrlDTO dto);
 }

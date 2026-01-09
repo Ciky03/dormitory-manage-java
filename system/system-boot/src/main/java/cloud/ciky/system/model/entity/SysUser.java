@@ -62,10 +62,10 @@ public class SysUser extends BaseEntity {
     private Boolean status;
 
     /**
-     * 用户头像
+     * 用户头像附件id
      */
-    @TableField("avatar")
-    private String avatar;
+    @TableField("avatar_attach_id")
+    private String avatarAttachId;
 
 
     /**

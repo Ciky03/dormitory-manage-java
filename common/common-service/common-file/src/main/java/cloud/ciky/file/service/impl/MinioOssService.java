@@ -3,6 +3,7 @@ package cloud.ciky.file.service.impl;
 import cloud.ciky.base.constant.DateFormatConstants;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.file.model.dto.FileDTO;
+import cloud.ciky.file.model.dto.TempUrlDTO;
 import cloud.ciky.file.service.OssService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
@@ -10,6 +11,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
 import io.minio.*;
+import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
@@ -26,8 +28,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -104,13 +109,7 @@ public class MinioOssService implements OssService {
             String fileUrl;
             // 未配置自定义域名
             if (CharSequenceUtil.isBlank(customDomain)) {
-                GetPresignedObjectUrlArgs getPresignedObjectUrlArgs = GetPresignedObjectUrlArgs.builder()
-                        .bucket(bucketName).object(fileName)
-                        .method(Method.GET)
-                        .build();
-
-                fileUrl = minioClient.getPresignedObjectUrl(getPresignedObjectUrlArgs);
-                fileUrl = fileUrl.substring(0, fileUrl.indexOf("?"));
+                fileUrl = getTempUrl(new TempUrlDTO(bucketName, fileName));
             } else {
                 // 配置自定义文件路径域名
                 fileUrl = customDomain + '/' + bucketName + '/' + fileName;
@@ -263,20 +262,9 @@ public class MinioOssService implements OssService {
 
         //7. 文件url
         String fileUrl;
-        //未配置自定义域名
         if (CharSequenceUtil.isBlank(customDomain)) {
             //https://<minio-server-endpoint>/<bucket-name>/<object-name>?.....
-            try {
-                fileUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-                        .bucket(bucket)
-                        .object(object)
-                        .method(Method.GET)
-                        .build());
-            } catch (Exception e) {
-                log.error("获取文件URL失败", e);
-                throw new BusinessException("获取文件URL失败");
-            }
-            fileUrl = fileUrl.substring(0, fileUrl.indexOf("?"));
+            fileUrl = getTempUrl(new TempUrlDTO(bucket, object));
         } else {
             fileUrl = customDomain + '/' + bucket + '/' + object;
         }
@@ -290,6 +278,21 @@ public class MinioOssService implements OssService {
         fileDto.setSize(fileSize);
         fileDto.setMimeType(FileUtil.getMimeType(originName));
         return fileDto;
+    }
+
+    @Override
+    public String getTempUrl(TempUrlDTO dto) {
+        try {
+            return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                    .bucket(dto.getBucket())
+                    .object(dto.getPath())
+                    .method(Method.GET)
+                    .expiry(3, TimeUnit.DAYS)
+                    .build());
+        } catch (Exception e) {
+            log.error("获取文件URL失败", e);
+            throw new BusinessException("获取文件URL失败");
+        }
     }
 
 

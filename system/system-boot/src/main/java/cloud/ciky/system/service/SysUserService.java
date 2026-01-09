@@ -142,4 +142,18 @@ public interface SysUserService extends IService<SysUser> {
      * @return boolean
      */
     boolean changePassword(String userId, PwdUpdateForm form);
+
+    /**
+     * <p>
+     * 修改头像
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/9 1:14
+     * @param userId 用户id
+     * @param attachId 附件id (sys_attach表主键)
+     * @return boolean
+     */
+    boolean changeAvatar(String userId, String attachId);
+
 }

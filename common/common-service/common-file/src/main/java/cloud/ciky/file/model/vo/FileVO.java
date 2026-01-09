@@ -29,10 +29,4 @@ public class FileVO {
     @Schema(description = "文件URL")
     private String url;
 
-    @Schema(description = "文件桶")
-    private String bucket;
-
-    @Schema(description = "文件路径")
-    private String path;
-
 }

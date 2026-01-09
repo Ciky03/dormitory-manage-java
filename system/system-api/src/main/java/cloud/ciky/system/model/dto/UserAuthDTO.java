@@ -71,8 +71,8 @@ public class UserAuthDTO {
     private String email;
 
     /**
-     * 头像(OIDC UserInfo)
+     * 头像附件id(OIDC UserInfo)
      */
-    private String avatar;
+    private String avatarAttachId;
 
 }

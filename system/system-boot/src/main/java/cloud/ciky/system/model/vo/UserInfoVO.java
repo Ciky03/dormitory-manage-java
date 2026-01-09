@@ -1,5 +1,6 @@
 package cloud.ciky.system.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -22,6 +23,10 @@ public class UserInfoVO {
 
     @Schema(description = "用户姓名")
     private String realName;
+
+    @JsonIgnore
+    @Schema(description = "头像附件id")
+    private String avatarAttachId;
 
     @Schema(description = "头像地址")
     private String avatar;

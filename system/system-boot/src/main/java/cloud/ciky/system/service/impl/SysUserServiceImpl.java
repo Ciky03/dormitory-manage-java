@@ -1,12 +1,18 @@
 package cloud.ciky.system.service.impl;
 
 import cloud.ciky.base.BaseQuery;
+import cloud.ciky.base.constant.RedisConstants;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.base.model.Option;
+import cloud.ciky.file.model.dto.FileDTO;
+import cloud.ciky.file.model.dto.TempUrlDTO;
+import cloud.ciky.file.service.OssService;
+import cloud.ciky.file.service.impl.MinioOssService;
 import cloud.ciky.mail.service.MailService;
 import cloud.ciky.security.service.PermissionService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.model.dto.UserAuthDTO;
+import cloud.ciky.system.model.entity.SysAttach;
 import cloud.ciky.system.model.entity.SysUser;
 import cloud.ciky.system.mapper.SysUserMapper;
 import cloud.ciky.system.model.entity.SysUserRole;
@@ -14,6 +20,7 @@ import cloud.ciky.system.model.form.PwdUpdateForm;
 import cloud.ciky.system.model.form.UserForm;
 import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
+import cloud.ciky.system.service.SysAttachService;
 import cloud.ciky.system.service.SysRoleMenuService;
 import cloud.ciky.system.service.SysUserRoleService;
 import cloud.ciky.system.service.SysUserService;
@@ -33,12 +40,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -58,6 +68,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final PasswordEncoder passwordEncoder;
     private final SysUserRoleService userRoleService;
     private final MailService mailService;
+    private final SysAttachService attachService;
+    private final OssService ossService;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public UserAuthDTO getUserAuthInfo(String authKey) {
@@ -74,11 +87,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户不存在");
         }
 
+        // 获取附件信息
+        String avatarAttachId = userInfoVO.getAvatarAttachId();
+        userInfoVO.setAvatar(getAvatarAttachUrl(avatarAttachId));
+
         // 获取用户角色集合
         Set<String> roles = SecurityUtils.getRoles();
         userInfoVO.setRoles(roles);
 
         // 获取用户权限集合
+        userInfoVO.setPerms(getUserPerms(roles));
+
+        return userInfoVO;
+    }
+
+    /**
+     * <p>
+     * 获取用户权限集合
+     * </p>
+     *
+     * @param roles 角色编码集合
+     * @return java.util.Set<java.lang.String>
+     * @author ciky
+     * @since 2026/1/9 15:23
+     */
+    @NotNull
+    private Set<String> getUserPerms(Set<String> roles) {
         Set<String> perms = new HashSet<>();
         if (CollUtil.isNotEmpty(roles)) {
             Set<String> rolePermsFormCache = permissionService.getRolePermsFormCache(roles);
@@ -90,10 +124,38 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             log.info("角色权限列表：{}", rolePermsFormCache);
             perms.addAll(rolePermsFormCache);
         }
+        return perms;
+    }
 
-        userInfoVO.setPerms(perms);
-
-        return userInfoVO;
+    /**
+     * <p>
+     * 获取头像附件临时URL
+     * </p>
+     *
+     * @param avatarAttachId 头像附件id
+     * @return java.lang.String
+     * @author ciky
+     * @since 2026/1/9 15:23
+     */
+    private String getAvatarAttachUrl(String avatarAttachId) {
+        if (CharSequenceUtil.isNotBlank(avatarAttachId)) {
+            // 从redis获取
+            String avatar = redisTemplate.opsForValue().get(RedisConstants.Attach.AVATAR + avatarAttachId);
+            if (CharSequenceUtil.isBlank(avatar)) {
+                // 缓存查询不到,获取附件临时url
+                SysAttach avatarAttach = attachService.getById(avatarAttachId);
+                if (avatarAttach == null) {
+                    return null;
+                }
+                TempUrlDTO dto = new TempUrlDTO(avatarAttach.getBucket(), avatarAttach.getPath());
+                avatar = ossService.getTempUrl(dto);
+                log.info("用户头像url:{}", avatar);
+                // 缓存到redis
+                redisTemplate.opsForValue().set(RedisConstants.Attach.AVATAR + avatarAttachId, avatar, 3, TimeUnit.DAYS);
+            }
+            return avatar;
+        }
+        return null;
     }
 
     @Override
@@ -291,6 +353,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
                 .set(SysUser::getPassword, passwordEncoder.encode(newPassword))
+                .set(SysUser::getUpdateBy, optUser)
+                .eq(SysUser::getId, userId);
+
+        return this.update(wrapper);
+    }
+
+    @Override
+    public boolean changeAvatar(String userId, String attachId) {
+        String optUser = SecurityUtils.getUserId();
+
+        // 判断附件是否存在
+        SysAttach attach = attachService.getById(attachId);
+        if (attach == null) {
+            throw new BusinessException("头像信息未保存, 请联系管理员!");
+        }
+
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getAvatarAttachId, attachId)
                 .set(SysUser::getUpdateBy, optUser)
                 .eq(SysUser::getId, userId);
 

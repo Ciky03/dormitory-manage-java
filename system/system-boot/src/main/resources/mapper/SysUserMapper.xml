@@ -10,7 +10,7 @@
         <result column="phone" property="phone" />
         <result column="email" property="email" />
         <result column="status" property="status" />
-        <result column="avatar" property="avatar" />
+        <result column="avatar_attach_id" property="avatarAttachId" />
         <result column="create_by" property="createBy" />
         <result column="create_time" property="createTime" />
         <result column="update_by" property="updateBy" />
@@ -20,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, username, password, phone, email, status, avatar, create_by, create_time, update_by, update_time, delflag
+        id, username, password, phone, email, status, avatar_attach_id, create_by, create_time, update_by, update_time, delflag
     </sql>
 
     <!-- 用户认证信息映射 -->
@@ -33,7 +33,7 @@
         <result property="nickname" column="nickname"/>
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
-        <result property="avatar" column="avatar"/>
+        <result property="avatarAttachId" column="avatar_attach_id"/>
 
         <collection property="roles" ofType="string" javaType="java.util.Set">
             <result column="code"/>
@@ -66,7 +66,7 @@
         select
             su.id,
             su.real_name,
-            su.avatar
+            su.avatar_attach_id
         from sys_user su
         where su.id = #{userId}
     </select>
