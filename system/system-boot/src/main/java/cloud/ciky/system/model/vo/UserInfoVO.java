@@ -39,4 +39,11 @@ public class UserInfoVO {
 
     @Schema(description = "用户权限标识集合")
     private Set<String> perms;
+
+    @JsonIgnore
+    @Schema(description = "微信公众号openId")
+    private String wxMpOpenId;
+
+    @Schema(description = "是否绑定微信公众号(0-否 1-是)")
+    private Boolean isBindWxMp;
 }

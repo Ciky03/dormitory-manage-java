@@ -69,9 +69,16 @@ public class SysUser extends BaseEntity {
 
 
     /**
-     * 微信unionId
+     * 微信公众号openId
      */
-    @TableField("union_id")
-    private String unionId;
+    @TableField("wx_mp_openId")
+    private String wxMpOpenId;
+
+    /**
+     * 微信小程序openId
+     */
+    @TableField("wx_mini_openId")
+    private String wxMiniOpenId;
+
 
 }

@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * <p>
- *  用户表 前端控制器
+ * 用户表 前端控制器
  * </p>
  *
  * @author ciky
@@ -166,6 +166,16 @@ public class UserController {
     ) {
         String optUser = SecurityUtils.getUserId();
         boolean result = userService.changeAvatar(optUser, attachId);
+        return Result.judge(result);
+    }
+
+
+    @Operation(summary = "绑定微信公众号")
+    @Log(value = "绑定微信公众号", module = LogModuleEnum.USER)
+    @PutMapping("/bind/wx/mp")
+    @RepeatSubmit
+    public Result<Void> bindWxMp(@RequestParam String userId, @RequestParam String openId) {
+        boolean result = userService.bindWxMp(userId, openId);
         return Result.judge(result);
     }
 

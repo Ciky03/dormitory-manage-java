@@ -86,6 +86,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (userInfoVO == null) {
             throw new BusinessException("用户不存在");
         }
+        // 是否绑定微信公众号
+        userInfoVO.setIsBindWxMp(CharSequenceUtil.isNotBlank(userInfoVO.getWxMpOpenId()));
 
         // 获取附件信息
         String avatarAttachId = userInfoVO.getAvatarAttachId();
@@ -372,6 +374,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
                 .set(SysUser::getAvatarAttachId, attachId)
                 .set(SysUser::getUpdateBy, optUser)
+                .eq(SysUser::getId, userId);
+
+        return this.update(wrapper);
+    }
+
+    @Override
+    public boolean bindWxMp(String userId, String openId) {
+        LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
+                .set(SysUser::getWxMpOpenId, openId)
+                .set(SysUser::getUpdateBy, userId)
                 .eq(SysUser::getId, userId);
 
         return this.update(wrapper);

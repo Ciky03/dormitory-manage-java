@@ -71,6 +71,11 @@
             <artifactId>weixin-java-miniapp</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+        </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>com.github.binarywang</groupId>-->
         <!--            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>-->

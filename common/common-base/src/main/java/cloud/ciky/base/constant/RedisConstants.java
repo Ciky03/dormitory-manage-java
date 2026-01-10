@@ -31,6 +31,13 @@ public interface RedisConstants {
         String EMAIL_CODE = "captcha:email";              // 邮箱验证码
     }
 
+    /**
+     * 微信公众号
+     */
+    interface WxMp {
+        String BIND_TOKEN = "wx:mp:bind:";  //绑定微信
+    }
+
 
     /**
      * 系统模块

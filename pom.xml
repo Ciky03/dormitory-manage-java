@@ -59,6 +59,7 @@
         <hutool.version>5.8.38</hutool.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <weixin-java.version>4.7.0</weixin-java.version>
+        <weixin-java-mp.version>4.4.0</weixin-java-mp.version>
         <easyexcel.version>3.3.4</easyexcel.version>
         <nimbus-jose-jwt.version>9.16.1</nimbus-jose-jwt.version>
 
@@ -161,12 +162,21 @@
                 <version>${minio.version}</version>
             </dependency>
 
+            <!--微信公众号-->
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-mp</artifactId>
+                <version>${weixin-java-mp.version}</version>
+            </dependency>
+
+            <!--微信小程序-->
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-miniapp</artifactId>
                 <version>${weixin-java.version}</version>
             </dependency>
 
+            <!--企业微信-->
             <!-- https://mvnrepository.com/artifact/com.github.binarywang/weixin-java-cp -->
             <dependency>
                 <groupId>com.github.binarywang</groupId>

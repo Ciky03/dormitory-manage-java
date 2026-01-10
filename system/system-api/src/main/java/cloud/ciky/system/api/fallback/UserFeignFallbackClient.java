@@ -25,4 +25,10 @@ public class UserFeignFallbackClient implements UserFeignClient {
         log.error(FALLBACK_MSG);
         return Result.failed();
     }
+
+    @Override
+    public Result<Void> bindWxMp(String userId, String openId) {
+        log.error(FALLBACK_MSG);
+        return Result.failed();
+    }
 }

@@ -156,4 +156,16 @@ public interface SysUserService extends IService<SysUser> {
      */
     boolean changeAvatar(String userId, String attachId);
 
+    /**
+     * <p>
+     * 绑定微信公众号
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/1/10 23:54
+     * @param userId 用户id
+     * @param openId 微信公众号openId
+     * @return boolean
+     */
+    boolean bindWxMp(String userId, String openId);
 }
