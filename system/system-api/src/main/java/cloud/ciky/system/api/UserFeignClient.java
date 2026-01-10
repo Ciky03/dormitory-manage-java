@@ -28,6 +28,6 @@ public interface UserFeignClient {
     @GetMapping("/user/authInfo/{authKey}")
     Result<UserAuthDTO> getUserAuthInfo(@Parameter(description = "用户名/手机号/邮箱") @PathVariable String authKey);
 
-    @PutMapping("/user/bind/wx/mp")
+    @PutMapping("/user/internal/bind/wx/mp")
     Result<Void> bindWxMp(@RequestParam String userId, @RequestParam String openId);
 }

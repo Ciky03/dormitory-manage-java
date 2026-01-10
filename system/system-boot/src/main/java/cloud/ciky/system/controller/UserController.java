@@ -170,9 +170,9 @@ public class UserController {
     }
 
 
-    @Operation(summary = "绑定微信公众号")
+    @Operation(summary = "绑定微信公众号(内部调用)")
     @Log(value = "绑定微信公众号", module = LogModuleEnum.USER)
-    @PutMapping("/bind/wx/mp")
+    @PutMapping("/internal/bind/wx/mp")
     @RepeatSubmit
     public Result<Void> bindWxMp(@RequestParam String userId, @RequestParam String openId) {
         boolean result = userService.bindWxMp(userId, openId);
