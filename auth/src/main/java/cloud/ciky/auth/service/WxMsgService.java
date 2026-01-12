@@ -10,6 +10,7 @@ import cloud.ciky.base.model.KeyValue;
 import cloud.ciky.base.model.Option;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
+import cloud.ciky.system.model.dto.UserAuthDTO;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.alibaba.nacos.common.utils.UuidUtils;
 import lombok.RequiredArgsConstructor;
@@ -204,10 +205,20 @@ public class WxMsgService {
         String key = getRedisKey(LOGIN_VALUE, ticket);
         String content = null;
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-            redisTemplate.opsForHash().put(key, "openIdToken", openIdToken);
-            redisTemplate.opsForHash().put(key, "status", WxMpStatusEnum.CONFIRMED.getValue());
-            content = "登录成功!";
-            log.info("用户openId保存成功!");
+
+            // 判断用户是否存在
+            UserAuthDTO user = userFeignClient.getUserDetailsByWxMpOpenId(openId).getData();
+            if (user == null) {
+                redisTemplate.opsForHash().put(key, "status", WxMpStatusEnum.EXPIRED.getValue());
+                content = "用户不存在, 请先登录绑定用户!";
+                log.error("该openId({})未绑定用户", openId);
+            } else {
+                redisTemplate.opsForHash().put(key, "openIdToken", openIdToken);
+                redisTemplate.opsForHash().put(key, "status", WxMpStatusEnum.CONFIRMED.getValue());
+                content = "登录成功!";
+                log.info("用户openId保存成功!");
+            }
+
         } else {
             content = "登录失败, 请重新扫码二维码!";
             log.error("用户openId保存失败!");
