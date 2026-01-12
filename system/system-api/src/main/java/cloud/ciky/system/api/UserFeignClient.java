@@ -25,9 +25,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "system", contextId = "user", fallback = UserFeignFallbackClient.class, configuration = {FeignDecoderConfig.class})
 public interface UserFeignClient {
 
-    @GetMapping("/user/authInfo/{authKey}")
+    @GetMapping("/user/internal/authInfo/{authKey}")
     Result<UserAuthDTO> getUserAuthInfo(@Parameter(description = "用户名/手机号/邮箱") @PathVariable String authKey);
+
+    @GetMapping("/user/internal/authInfo/wx/mp/{wxMpOpenId}")
+    Result<UserAuthDTO> getUserDetailsByWxMpOpenId(@Parameter(description = "微信公众号openId") @PathVariable String wxMpOpenId);
 
     @PutMapping("/user/internal/bind/wx/mp")
     Result<Void> bindWxMp(@RequestParam String userId, @RequestParam String openId);
+
+
 }

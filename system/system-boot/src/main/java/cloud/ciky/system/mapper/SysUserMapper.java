@@ -30,10 +30,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @author ciky
      * @since 2025/12/15 17:33
      * @param authKey 用户名/手机号/邮箱
+     * @param wxMpOpenId 微信公众号openId
      * @return cloud.ciky.system.model.dto.UserAuthDTO
      */
 //    @DataPermission
-    UserAuthDTO getUserAuthInfo(String authKey);
+    UserAuthDTO getUserAuthInfo(String authKey, String wxMpOpenId);
 
     /**
      * <p>

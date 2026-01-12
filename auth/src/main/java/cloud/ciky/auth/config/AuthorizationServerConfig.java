@@ -16,6 +16,9 @@ import cloud.ciky.auth.oauth2.extension.wechat.WechatAuthenticationToken;
 import cloud.ciky.auth.oauth2.extension.wework.WeworkAuthenticationConverter;
 import cloud.ciky.auth.oauth2.extension.wework.WeworkAuthenticationProvider;
 import cloud.ciky.auth.oauth2.extension.wework.WeworkAuthenticationToken;
+import cloud.ciky.auth.oauth2.extension.wxmp.WxMpAuthenticationConverter;
+import cloud.ciky.auth.oauth2.extension.wxmp.WxMpAuthenticationProvider;
+import cloud.ciky.auth.oauth2.extension.wxmp.WxMpAuthenticationToken;
 import cloud.ciky.auth.oauth2.handler.MyAuthenticationFailureHandler;
 import cloud.ciky.auth.oauth2.handler.MyAuthenticationSuccessHandler;
 import cloud.ciky.auth.oauth2.jackson.SysUserDeserializer;
@@ -24,6 +27,7 @@ import cloud.ciky.auth.oauth2.oidc.CustomOidcAuthenticationConverter;
 import cloud.ciky.auth.oauth2.oidc.CustomOidcAuthenticationProvider;
 import cloud.ciky.auth.oauth2.oidc.CustomOidcUserInfoService;
 import cloud.ciky.auth.service.WeworkUserDetailsService;
+import cloud.ciky.auth.service.WxMpUserDetailService;
 import cloud.ciky.base.constant.RedisConstants;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.hutool.captcha.generator.CodeGenerator;
@@ -103,9 +107,12 @@ public class AuthorizationServerConfig {
 
     private final WeworkUserDetailsService weworkUserDetailsService;
 
+    private final WxMpUserDetailService wxMpUserDetailService;
+
     private final StringRedisTemplate redisTemplate;
 
     private final CodeGenerator codeGenerator;
+
     private final PasswordEncoder passwordEncoder;
 
     private final WxMaService wxMaService;
@@ -145,30 +152,32 @@ public class AuthorizationServerConfig {
 
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                 .tokenEndpoint(tokenEndpoint -> tokenEndpoint
-                        // (2) 自定义授权模式转换器(Converter)
-                        .accessTokenRequestConverters(authenticationConverters -> authenticationConverters.addAll(
-                                List.of(
-                                        new PasswordAuthenticationConverter(),
-                                        new CaptchaAuthenticationConverter(),
-                                        new WeworkAuthenticationConverter(),
-                                        new WechatAuthenticationConverter(),
-                                        new SmsCodeAuthenticationConverter()
-                                ))
-                        )
-                        // (3) 自定义授权模式提供者(Provider)
-                        .authenticationProviders(authenticationProviders -> authenticationProviders.addAll(
-                                List.of(
-                                        new PasswordAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator),
-                                        new CaptchaAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator, redisTemplate, codeGenerator),
-                                        new WeworkAuthenticationProvider(authorizationService, tokenGenerator, weworkUserDetailsService),
-                                        new WechatAuthenticationProvider(authorizationService, tokenGenerator,  wxMaService),
-                                        new SmsCodeAuthenticationProvider(authorizationService, tokenGenerator, redisTemplate)
-                                ))
-                        )
-                        // (4) 自定义成功响应
-                        .accessTokenResponseHandler(new MyAuthenticationSuccessHandler(redisTemplate))
-                        // (5) 自定义失败响应
-                        .errorResponseHandler(new MyAuthenticationFailureHandler())
+                                // (2) 自定义授权模式转换器(Converter)
+                                .accessTokenRequestConverters(authenticationConverters -> authenticationConverters.addAll(
+                                                List.of(
+                                                        new PasswordAuthenticationConverter(),
+                                                        new CaptchaAuthenticationConverter(),
+                                                        new WxMpAuthenticationConverter()
+//                                        new WeworkAuthenticationConverter(),
+//                                        new WechatAuthenticationConverter(),
+//                                        new SmsCodeAuthenticationConverter()
+                                                ))
+                                )
+                                // (3) 自定义授权模式提供者(Provider)
+                                .authenticationProviders(authenticationProviders -> authenticationProviders.addAll(
+                                                List.of(
+                                                        new PasswordAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator),
+                                                        new CaptchaAuthenticationProvider(authenticationManager, authorizationService, tokenGenerator, redisTemplate, codeGenerator),
+                                                        new WxMpAuthenticationProvider(authorizationService, tokenGenerator, redisTemplate, wxMpUserDetailService)
+//                                        new WeworkAuthenticationProvider(authorizationService, tokenGenerator, weworkUserDetailsService),
+//                                        new WechatAuthenticationProvider(authorizationService, tokenGenerator,  wxMaService),
+//                                        new SmsCodeAuthenticationProvider(authorizationService, tokenGenerator, redisTemplate)
+                                                ))
+                                )
+                                // (4) 自定义成功响应
+                                .accessTokenResponseHandler(new MyAuthenticationSuccessHandler(redisTemplate))
+                                // (5) 自定义失败响应
+                                .errorResponseHandler(new MyAuthenticationFailureHandler())
                 )
                 // (6)启用 OpenID Connect 1.0 自定义
                 .oidc(oidcCustomizer ->
@@ -381,6 +390,7 @@ public class AuthorizationServerConfig {
                 .authorizationGrantType(AuthorizationGrantType.PASSWORD) // 密码模式
                 .authorizationGrantType(CaptchaAuthenticationToken.CAPTCHA) // 验证码+密码模式
                 .authorizationGrantType(WeworkAuthenticationToken.WEWORK) // 企业微信模式
+                .authorizationGrantType(WxMpAuthenticationToken.WECHAT_MP)  // 微信公众号模式
                 .authorizationGrantType(WechatAuthenticationToken.WECHAT_MINI_APP) // 微信小程序模式
                 .authorizationGrantType(SmsCodeAuthenticationToken.SMS_CODE) // 短信验证码模式
                 .redirectUri("http://127.0.0.1:9991/authorized")

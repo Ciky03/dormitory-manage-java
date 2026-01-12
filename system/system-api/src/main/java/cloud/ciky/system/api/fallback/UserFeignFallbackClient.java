@@ -27,6 +27,12 @@ public class UserFeignFallbackClient implements UserFeignClient {
     }
 
     @Override
+    public Result<UserAuthDTO> getUserDetailsByWxMpOpenId(String wxMpOpenId) {
+        log.error(FALLBACK_MSG);
+        return Result.failed();
+    }
+
+    @Override
     public Result<Void> bindWxMp(String userId, String openId) {
         log.error(FALLBACK_MSG);
         return Result.failed();

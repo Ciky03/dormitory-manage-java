@@ -73,8 +73,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final StringRedisTemplate redisTemplate;
 
     @Override
-    public UserAuthDTO getUserAuthInfo(String authKey) {
-        UserAuthDTO userAuthDto = this.baseMapper.getUserAuthInfo(authKey);
+    public UserAuthDTO getUserAuthInfo(String authKey, String wxMpOpenId) {
+        UserAuthDTO userAuthDto = this.baseMapper.getUserAuthInfo(authKey, wxMpOpenId);
         return userAuthDto;
     }
 

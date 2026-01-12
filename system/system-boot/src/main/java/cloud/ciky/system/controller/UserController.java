@@ -44,11 +44,20 @@ public class UserController {
     private final SysUserService userService;
 
     @Operation(summary = "获取用户认证信息", hidden = true)
-    @GetMapping("/authInfo/{authKey}")
+    @GetMapping("/internal/authInfo/{authKey}")
     public Result<UserAuthDTO> getUserAuthInfo(
             @Parameter(description = "用户名/手机号/邮箱") @PathVariable String authKey
     ) {
-        UserAuthDTO userAuthInfo = userService.getUserAuthInfo(authKey);
+        UserAuthDTO userAuthInfo = userService.getUserAuthInfo(authKey, null);
+        return Result.success(userAuthInfo);
+    }
+
+    @Operation(summary = "通过微信公众号openId获取用户认证信息", hidden = true)
+    @GetMapping("/internal/authInfo/wx/mp/{wxMpOpenId}")
+    public Result<UserAuthDTO> getUserDetailsByWxMpOpenId(
+            @Parameter(description = "微信公众号openId") @PathVariable String wxMpOpenId
+    ) {
+        UserAuthDTO userAuthInfo = userService.getUserAuthInfo(null, wxMpOpenId);
         return Result.success(userAuthInfo);
     }
 

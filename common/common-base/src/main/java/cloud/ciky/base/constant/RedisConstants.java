@@ -36,6 +36,8 @@ public interface RedisConstants {
      */
     interface WxMp {
         String BIND_TOKEN = "wx:mp:bind:";  //绑定微信
+        String LOGIN_TOKEN = "wx:mp:login:"; //登录微信
+        String OPEN_ID_TOKEN = "wx:mp:login:openId:"; //openId
     }
 
 

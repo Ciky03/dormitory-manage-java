@@ -14,14 +14,11 @@ import lombok.Data;
 @Data
 public class WxQrCode {
 
-    @Schema(description = "认证url")
-    private String url;
+    @Schema(description = "二维码url")
+    private String qrCodeUrl;
 
     @Schema(description = "绑定微信token")
     private String bindToken;
-
-    @Schema(description = "二维码url")
-    private String qrCodeUrl;
 
     @Schema(description = "登录微信token")
     private String loginToken;

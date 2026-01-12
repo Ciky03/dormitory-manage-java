@@ -31,9 +31,10 @@ public interface SysUserService extends IService<SysUser> {
      * @author ciky
      * @since 2025/12/15 17:26
      * @param authKey 用户名/手机号/邮箱
+     * @param wxMpOpenId 微信公众号openId
      * @return cloud.ciky.system.model.dto.UserAuthDTO
      */
-    UserAuthDTO getUserAuthInfo(String authKey);
+    UserAuthDTO getUserAuthInfo(String authKey, String wxMpOpenId);
 
     /**
      * <p>

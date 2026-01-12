@@ -33,9 +33,12 @@ public class ScanHandler implements WxMpMessageHandler {
         String eventKey = wxMpXmlMessage.getEventKey();
         String sceneId = eventKey.replace("qrscene_", "");
 
-        // 101: 绑定微信
-        if(sceneId.equals(WxMpSceneIdEnum.BIND.getValue())){
+        if (sceneId.equals(WxMpSceneIdEnum.BIND.getValue())) {
+            // 101: 绑定微信
             return wxMsgService.bindScan(wxMpXmlMessage);
+        } else if (sceneId.equals(WxMpSceneIdEnum.LOGIN.getValue())) {
+            // 201: 登录微信
+            return wxMsgService.loginScan(wxMpXmlMessage);
         }
 
         return null;
