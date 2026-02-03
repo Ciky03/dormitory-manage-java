@@ -19,6 +19,7 @@
         <module>common/common-generator</module>
         <module>system/system-api</module>
         <module>system/system-boot</module>
+        <module>business</module>
         <!--<module>common/common-framework/common-security</module>-->
         <!--<module>common/common-framework/common-mybatis</module>-->
         <!--<module>common/common-service</module>-->
@@ -207,7 +208,13 @@
             <dependency>
                 <groupId>cloud.ciky</groupId>
                 <artifactId>system-api</artifactId>
-                <version>1.0.0</version>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cloud.ciky</groupId>
+                <artifactId>business-api</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
@@ -231,7 +238,7 @@
             <dependency>
                 <groupId>cloud.ciky</groupId>
                 <artifactId>common-mybatis</artifactId>
-                <version>1.0.0</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!--<dependency>-->

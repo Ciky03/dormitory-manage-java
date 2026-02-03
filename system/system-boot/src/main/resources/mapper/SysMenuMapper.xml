@@ -55,6 +55,7 @@
                 #{role}
             </foreach>
         </if>
+        order by m.sort
     </select>
 
 </mapper>

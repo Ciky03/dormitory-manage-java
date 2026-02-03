@@ -1,0 +1,26 @@
+server:
+  port: 9993
+
+spring:
+  application:
+    name: business
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+
+  cloud:
+    nacos:
+      discovery:
+        #        server-addr: http://192.168.65.128:8848
+        server-addr: http://8.138.89.145:8848
+        namespace: dormitory-manager-${spring.profiles.active}
+      config:
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        namespace: dormitory-manager-${spring.profiles.active}
+        file-extension: yaml
+        refresh-enabled: true
+        shared-configs:
+          - data-id: common.yaml
+            refresh: true
+
