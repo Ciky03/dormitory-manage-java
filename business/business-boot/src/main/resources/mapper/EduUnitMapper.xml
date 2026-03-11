@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cloud.ciky.business.mapper.EduUnitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.EduUnit">
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId" />
+        <result column="tree_path" property="treePath" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="grade_year" property="gradeYear" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="delflag" property="delflag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, parent_id, tree_path, type, name, grade_year, create_by, create_time, update_by, update_time, delflag
+    </sql>
+
+    <!--获取班级列表-->
+    <select id="listClass" resultType="cloud.ciky.business.model.vo.ClassPageVO">
+        select class.id,
+               class.grade_year,
+               class.name   as className,
+               college.id as collegeId,
+               college.name as collegeName,
+               major.id as majorId,
+               major.name   as majorName,
+               class.create_time
+        from edu_unit class
+                 left join edu_unit college
+                           on find_in_set(college.id, class.tree_path) and college.type = 1 and college.delflag = 0
+                 left join edu_unit major
+                           on major.id = class.parent_id and major.type = 2 and college.delflag = 0
+        where class.type = 3
+             and class.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+             and (class.name like concat('%', #{query.keywords}, '%')
+                 or college.name like concat('%', #{query.keywords}, '%')
+                 or major.name like concat('%', #{query.keywords}, '%'))
+        </if>
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.parentId)">
+             and find_in_set(#{query.parentId}, class.tree_path)
+        </if>
+        order by college.create_time, major.create_time, class.grade_year desc, class.create_time
+    </select>
+
+    <!--获取学院/专业/班级表单-->
+    <select id="selectUnitForm" resultType="cloud.ciky.business.model.form.EduUnitForm">
+        select
+            edu.id,
+            edu.parent_id,
+            edu.name,
+            edu.type as eduType,
+            edu.grade_year
+        from edu_unit edu
+        where edu.id = #{id} and edu.delflag = 0
+    </select>
+
+
+</mapper>
