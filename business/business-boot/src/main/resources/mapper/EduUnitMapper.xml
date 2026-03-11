@@ -36,7 +36,7 @@
                  left join edu_unit college
                            on find_in_set(college.id, class.tree_path) and college.type = 1 and college.delflag = 0
                  left join edu_unit major
-                           on major.id = class.parent_id and major.type = 2 and college.delflag = 0
+                           on major.id = class.parent_id and major.type = 2 and major.delflag = 0
         where class.type = 3
              and class.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
