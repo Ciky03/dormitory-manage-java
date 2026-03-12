@@ -22,7 +22,8 @@ public enum LogModuleEnum {
     ROLE("角色"),
     MENU("菜单"),
     DICT("字典"),
-    UNIT("学院/专业/班级");
+    UNIT("学院/专业/班级"),
+    ROOM("楼栋/宿舍");
 
     @JsonValue
     private final String moduleName;

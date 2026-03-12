@@ -21,4 +21,38 @@
         id, parent_id, tree_path, room_num, capacity, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <!--获取宿舍分页列表-->
+    <select id="selectRoom" resultType="cloud.ciky.business.model.vo.RoomPageVO">
+        select
+            room.id,
+            room.room_num,
+            room.capacity,
+            building.room_num as buildingNum,
+            room.create_time
+        from dm_room room
+        left join dm_room building on building.id = room.parent_id and building.delflag = 0
+                    and building.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+        where room.delflag = 0
+        and room.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (room.room_num like concat('%', #{query.keywords}, '%')
+            or building.room_num like concat('%', #{query.keywords}, '%'))
+        </if>
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.parentId)">
+            and room.parent_id = #{query.parentId}
+        </if>
+        order by building.room_num, room.room_num
+    </select>
+
+    <!--获取楼栋/宿舍表单-->
+    <select id="selectRoomForm" resultType="cloud.ciky.business.model.form.DmRoomForm">
+        select
+            room.id,
+            room.parent_id,
+            room.room_num,
+            room.capacity
+        from dm_room room
+        where room.id = #{id} and room.delflag = 0
+    </select>
+
 </mapper>
