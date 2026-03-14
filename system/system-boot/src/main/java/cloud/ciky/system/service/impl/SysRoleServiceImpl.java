@@ -80,6 +80,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
+    public String getRoleIdByCode(String roleCode) {
+        SysRole role = this.getOne(new LambdaQueryWrapper<SysRole>()
+                .eq(SysRole::getCode, roleCode));
+        return role != null ? role.getId() : null;
+    }
+
+    @Override
     public RoleForm getRoleForm(String roleId) {
         SysRole entity = this.getById(roleId);
         if (entity == null) {

@@ -45,6 +45,18 @@ public interface SysRoleService extends IService<SysRole> {
 
     /**
      * <p>
+     * 根据角色编码获取角色id
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/14 11:19
+     * @param roleCode 角色编码
+     * @return java.lang.String
+     */
+    String getRoleIdByCode(String roleCode);
+
+    /**
+     * <p>
      * 获取角色表单数据
      * </p>
      *
