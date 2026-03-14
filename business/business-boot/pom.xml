@@ -67,6 +67,11 @@
 
         <dependency>
             <groupId>cloud.ciky</groupId>
+            <artifactId>system-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.ciky</groupId>
             <artifactId>common-security</artifactId>
         </dependency>
 
