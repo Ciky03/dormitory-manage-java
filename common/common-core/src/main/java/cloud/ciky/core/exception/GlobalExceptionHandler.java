@@ -5,6 +5,7 @@ import cloud.ciky.base.result.Result;
 import cloud.ciky.base.result.ResultCode;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolation;
@@ -168,7 +169,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FeignException.BadRequest.class)
     public <T> Result<T> processException(FeignException.BadRequest e) {
         log.info("微服务feign调用异常:{}", e.getMessage());
-        return Result.failed(e.getMessage());
+
+        // 尝试解析服务返回的body
+        String content = e.contentUTF8();
+        try {
+            Result<?> result = new ObjectMapper().readValue(content, Result.class);
+            return Result.failed(result.getMsg());  // 只返回业务错误信息
+        } catch (Exception ex) {
+            log.warn("解析Feign返回body失败，直接返回原始msg", ex);
+            return Result.failed("服务调用异常");
+        }
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
