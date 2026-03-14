@@ -1,14 +1,11 @@
 package cloud.ciky.system.model.form;
 
 import cloud.ciky.base.constant.SystemConstants;
-import cloud.ciky.base.model.ValidationGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
-import java.time.format.DecimalStyle;
 import java.util.List;
 
 /**
@@ -44,12 +41,18 @@ public class UserForm {
     @Pattern(regexp = SystemConstants.PASSWORD_REGEX, message = "密码至少包含大小写字母和数字，长度至少为8位")
     private String confirmPassword;
 
+    @Schema(description = "用户类型(0-其他 1-学生 2-教师 3-宿管)")
+    private Integer userType;
+
+    @Schema(description = "用户业务id")
+    private String businessUserId;
+
     @Schema(description = "手机号码")
     @NotBlank(message = "手机号码不能为空")
     private String phone;
 
     @Schema(description = "邮箱号码")
-    @NotBlank(message = "邮箱不能为空")
+//    @NotBlank(message = "邮箱不能为空")
     private String email;
 
     @Schema(description = "角色ID集合")

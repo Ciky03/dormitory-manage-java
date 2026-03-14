@@ -13,7 +13,7 @@ import cloud.ciky.system.model.form.PwdUpdateForm;
 import cloud.ciky.system.model.form.UserForm;
 import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.alibaba.excel.enums.BooleanEnum;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -98,10 +98,10 @@ public class UserController {
     @PreAuthorize("@ss.hasPerm('sys:user:add')")
     @RepeatSubmit
     @PostMapping("/add")
-    public Result<String> addUser(
+    public Result<Boolean> addUser(
             @Validated @RequestBody UserForm userForm
     ) {
-        String result = userService.saveUser(userForm);
+        Boolean result = userService.saveUser(userForm);
         return Result.success(result);
     }
 
@@ -110,11 +110,11 @@ public class UserController {
     @PreAuthorize("@ss.hasPerm('sys:user:edit')")
     @RepeatSubmit
     @PutMapping(value = "/edit/{userId}")
-    public Result<String> updateUser(
+    public Result<Boolean> updateUser(
             @Parameter(description = "用户ID") @PathVariable String userId,
             @RequestBody @Validated UserForm userForm) {
         userForm.setId(userId);
-        String result = userService.saveUser(userForm);
+        Boolean result = userService.saveUser(userForm);
         return Result.success(result);
     }
 

@@ -181,7 +181,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String saveUser(UserForm formData) {
+    public Boolean saveUser(UserForm formData) {
         String id = formData.getId();
         String username = formData.getUsername();
         String phone = formData.getPhone();
@@ -216,13 +216,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
 
         // 判断邮箱
-        if (!Validator.isEmail(email)) {
-            throw new BusinessException("邮箱格式不正确!");
-        }
-        boolean emailExisted = this.exists(new LambdaQueryWrapper<SysUser>()
-                .ne(userIdExisted, SysUser::getId, id).eq(SysUser::getEmail, email));
-        if (emailExisted) {
-            throw new BusinessException("邮箱已存在，请修改后重试！");
+        if (CharSequenceUtil.isNotBlank(email)) {
+            if (!Validator.isEmail(email)) {
+                throw new BusinessException("邮箱格式不正确!");
+            }
+            boolean emailExisted = this.exists(new LambdaQueryWrapper<SysUser>()
+                    .ne(userIdExisted, SysUser::getId, id).eq(SysUser::getEmail, email));
+            if (emailExisted) {
+                throw new BusinessException("邮箱已存在，请修改后重试！");
+            }
         }
 
         SysUser entity = new SysUser();
@@ -236,21 +238,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (CharSequenceUtil.isNotBlank(password)) {
             entity.setPassword(passwordEncoder.encode(password));
         }
-        entity.setUsername(formData.getUsername());
         if (CharSequenceUtil.isNotBlank(realName)) {
-            entity.setNickname(PinyinUtil.getPinyin(realName));
+            entity.setNickname(PinyinUtil.getPinyin(realName,""));
             entity.setRealName(realName);
         }
+        entity.setUsername(formData.getUsername());
         entity.setPhone(formData.getPhone());
         entity.setEmail(formData.getEmail());
+        entity.setUserType(formData.getUserType());
+        entity.setBusinessUserId(formData.getBusinessUserId());
         entity.setStatus(true);
         boolean result = this.saveOrUpdate(entity);
 
         // 保存用户角色
         if (result) {
-            userRoleService.saveUserRoles(entity.getId(), formData.getRoleIds());
+            result = userRoleService.saveUserRoles(entity.getId(), formData.getRoleIds());
         }
-        return entity.getId();
+        return result;
     }
 
     @Override

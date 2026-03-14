@@ -3,6 +3,7 @@ package cloud.ciky.system.api.fallback;
 import cloud.ciky.base.result.Result;
 import cloud.ciky.system.api.UserFeignClient;
 import cloud.ciky.system.model.dto.UserAuthDTO;
+import cloud.ciky.system.model.form.UserForm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,12 @@ public class UserFeignFallbackClient implements UserFeignClient {
 
     @Override
     public Result<Void> bindWxMp(String userId, String openId) {
+        log.error(FALLBACK_MSG);
+        return Result.failed();
+    }
+
+    @Override
+    public Result<Boolean> addUser(UserForm userForm) {
         log.error(FALLBACK_MSG);
         return Result.failed();
     }

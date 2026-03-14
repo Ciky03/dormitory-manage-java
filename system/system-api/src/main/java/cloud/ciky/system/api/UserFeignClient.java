@@ -1,17 +1,19 @@
 package cloud.ciky.system.api;
 
+import cloud.ciky.base.enums.LogModuleEnum;
 import cloud.ciky.base.result.Result;
+import cloud.ciky.core.annotation.Log;
 import cloud.ciky.core.annotation.RepeatSubmit;
 import cloud.ciky.core.config.FeignDecoderConfig;
 import cloud.ciky.system.api.fallback.LogFeignFallbackClient;
 import cloud.ciky.system.api.fallback.UserFeignFallbackClient;
 import cloud.ciky.system.model.dto.UserAuthDTO;
+import cloud.ciky.system.model.form.UserForm;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -33,6 +35,9 @@ public interface UserFeignClient {
 
     @PutMapping("/user/internal/bind/wx/mp")
     Result<Void> bindWxMp(@RequestParam String userId, @RequestParam String openId);
+
+    @PostMapping("/user/add")
+    Result<Boolean> addUser(@Validated @RequestBody UserForm userForm);
 
 
 }

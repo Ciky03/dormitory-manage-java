@@ -92,7 +92,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param userForm 表单对象
      * @return java.lang.String
      */
-    String saveUser(UserForm userForm);
+    Boolean saveUser(UserForm userForm);
 
     /**
      * <p>

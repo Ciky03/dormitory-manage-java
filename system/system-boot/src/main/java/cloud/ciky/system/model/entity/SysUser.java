@@ -44,6 +44,18 @@ public class SysUser extends BaseEntity {
     private String password;
 
     /**
+     * 用户类型(0-其他 1-学生 2-教师 3-宿管)
+     */
+    @TableField("user_type")
+    private Integer userType;
+
+    /**
+     * 用户业务id
+     */
+    @TableField("business_user_id")
+    private String businessUserId;
+
+    /**
      * 手机号
      */
     @TableField("phone")
