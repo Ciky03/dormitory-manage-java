@@ -23,7 +23,10 @@ public enum LogModuleEnum {
     MENU("菜单"),
     DICT("字典"),
     UNIT("学院/专业/班级"),
-    ROOM("楼栋/宿舍");
+    ROOM("楼栋/宿舍"),
+    STUDENT("学生"),
+    TEACHER("教师"),
+    DORMITORY_MANAGER("宿管");
 
     @JsonValue
     private final String moduleName;
