@@ -32,6 +32,7 @@
 
     <select id="listRoutes" resultType="cloud.ciky.system.model.vo.RouteVO">
         select
+            distinct
             m.id,
             m.type,
             m.parent_id,
@@ -42,7 +43,8 @@
             m.icon,
             m.pitch_icon,
             m.visible,
-            m.keep_alive
+            m.keep_alive,
+            m.sort
         from sys_menu m
         inner join sys_role_menu rm on rm.menu_id = m.id and rm.delflag = 0
         inner join sys_role r on r.id = rm.role_id and r.delflag = 0 and r.status = 1
