@@ -385,6 +385,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public boolean bindWxMp(String userId, String openId) {
+        // 去重
+        long count = this.count(new LambdaQueryWrapper<SysUser>()
+                .ne(SysUser::getId, userId)
+                .eq(SysUser::getWxMpOpenId, openId));
+        if (count > 0) {
+            throw new BusinessException("该微信已绑定其他用户，请解绑后重试！");
+        }
+
         LambdaUpdateWrapper<SysUser> wrapper = new LambdaUpdateWrapper<SysUser>()
                 .set(SysUser::getWxMpOpenId, openId)
                 .set(SysUser::getUpdateBy, userId)
