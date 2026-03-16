@@ -44,4 +44,11 @@ public class UserFeignFallbackClient implements UserFeignClient {
         log.error(FALLBACK_MSG);
         return Result.failed();
     }
+
+    @Override
+    public Result<Boolean> unbindBusiness(String businessUserId) {
+        log.error(FALLBACK_MSG);
+        return Result.failed();
+    }
+
 }

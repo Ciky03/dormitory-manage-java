@@ -169,4 +169,16 @@ public interface SysUserService extends IService<SysUser> {
      * @return boolean
      */
     boolean bindWxMp(String userId, String openId);
+
+    /**
+     * <p>
+     * 业务账号解绑
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/17 0:05
+     * @param businessUserId 业务用户id
+     * @return boolean
+     */
+    boolean unbindBusiness(String businessUserId);
 }

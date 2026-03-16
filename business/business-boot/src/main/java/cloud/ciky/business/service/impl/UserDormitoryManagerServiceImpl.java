@@ -14,12 +14,17 @@ import cloud.ciky.system.enums.UserTypeEnum;
 import cloud.ciky.system.model.form.UserForm;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -42,7 +47,30 @@ public class UserDormitoryManagerServiceImpl extends ServiceImpl<UserDormitoryMa
     }
 
     @Override
-    @Transactional
+    public UserDormitoryManagerForm getDormitoryManagerForm(String id) {
+        return this.baseMapper.selectDormitoryManagerForm(id);
+    }
+
+    @Override
+    @GlobalTransactional(rollbackFor = Exception.class)
+    public boolean deleteDormitoryManager(String id) {
+        String optUser = SecurityUtils.getUserId();
+        // 逻辑删除,方便溯源
+        boolean update = this.update(new LambdaUpdateWrapper<UserDormitoryManager>()
+                .set(UserDormitoryManager::getDelflag, DelflagEnum.REMOVED.getValue())
+                .set(UserDormitoryManager::getUpdateBy, optUser)
+                .set(UserDormitoryManager::getUpdateTime, LocalDateTime.now())
+                .eq(UserDormitoryManager::getId, id));
+
+        // 系统用户表解绑
+        if (update) {
+            update = userFeignClient.unbindBusiness(id).getData();
+        }
+        return update;
+    }
+
+    @Override
+    @GlobalTransactional(rollbackFor = Exception.class)
     public boolean saveDormitoryManager(UserDormitoryManagerForm form) {
         String optUser = SecurityUtils.getUserId();
         String dmId = form.getId();

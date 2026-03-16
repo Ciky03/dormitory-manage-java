@@ -31,6 +31,30 @@ public interface UserTeacherService extends IService<UserTeacher> {
 
     /**
      * <p>
+     * 获取教师表单
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return cloud.ciky.business.model.form.UserTeacherForm
+     */
+    UserTeacherForm getTeacherForm(String id);
+
+    /**
+     * <p>
+     * 删除教师
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return boolean
+     */
+    boolean deleteTeacher(String id);
+
+    /**
+     * <p>
      * 保存教师
      * </p>
      *

@@ -31,6 +31,30 @@ public interface UserStudentService extends IService<UserStudent> {
 
     /**
      * <p>
+     * 获取学生表单
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return cloud.ciky.business.model.form.UserStudentForm
+     */
+    UserStudentForm getStudentForm(String id);
+
+    /**
+     * <p>
+     * 删除学生
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return boolean
+     */
+    boolean deleteStudent(String id);
+
+    /**
+     * <p>
      * 保存学生信息
      * </p>
      *

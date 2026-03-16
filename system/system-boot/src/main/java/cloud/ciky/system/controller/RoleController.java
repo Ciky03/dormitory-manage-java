@@ -57,13 +57,13 @@ public class RoleController {
         return Result.success(list);
     }
 
-    @Operation(summary = "获取角色id")
-    @GetMapping("/get/{roleCode}")
-    public Result<String> getRoleIdByCode(@PathVariable String roleCode){
-        String roleId = roleService.getRoleIdByCode(roleCode);
-        return Result.success(roleId);
-    }
-
+//    @Operation(summary = "获取角色id")
+//    @GetMapping("/get/{roleCode}")
+//    public Result<String> getRoleIdByCode(@PathVariable String roleCode){
+//        String roleId = roleService.getRoleIdByCode(roleCode);
+//        return Result.success(roleId);
+//    }
+//
     @Operation(summary = "角色表单数据")
     @GetMapping("/form/{roleId}")
     public Result<RoleForm> getRoleForm(

@@ -14,12 +14,15 @@ import cloud.ciky.system.enums.UserTypeEnum;
 import cloud.ciky.system.model.form.UserForm;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -39,6 +42,28 @@ public class UserTeacherServiceImpl extends ServiceImpl<UserTeacherMapper, UserT
     @Override
     public Page<TeacherPageVO> listTeacher(BaseQuery query) {
         return this.baseMapper.selectTeacherPage(new Page<>(query.getPageNum(), query.getPageSize()), query);
+    }
+
+    @Override
+    public UserTeacherForm getTeacherForm(String id) {
+        return this.baseMapper.selectTeacherForm(id);
+    }
+
+    @Override
+    public boolean deleteTeacher(String id) {
+        String optUser = SecurityUtils.getUserId();
+        // 逻辑删除,方便溯源
+        boolean update = this.update(new LambdaUpdateWrapper<UserTeacher>()
+                .set(UserTeacher::getDelflag, DelflagEnum.REMOVED.getValue())
+                .set(UserTeacher::getUpdateBy, optUser)
+                .set(UserTeacher::getUpdateTime, LocalDateTime.now())
+                .eq(UserTeacher::getId, id));
+
+        // 系统用户表解绑
+        if (update) {
+            update = userFeignClient.unbindBusiness(id).getData();
+        }
+        return update;
     }
 
     @Override

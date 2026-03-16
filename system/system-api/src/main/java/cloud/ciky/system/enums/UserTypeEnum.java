@@ -12,10 +12,10 @@ import lombok.Getter;
  * @since 2026/3/13 17:38
  */
 public enum UserTypeEnum implements IBaseEnum<Integer> {
-    OTHER(0, "其他"),
-    STUDENT(1, "学生"),
-    TEACHER(2, "教师"),
-    DORMITORY_MANAGER(3, "宿管");
+    OTHER(0, "其他", "OTHER"),
+    STUDENT(1, "学生", "STUDENT"),
+    TEACHER(2, "教师", "TEACHER"),
+    DORMITORY_MANAGER(3, "宿管", "DORMITORY_MANAGER");
 
     @Getter
     private Integer value;
@@ -23,9 +23,13 @@ public enum UserTypeEnum implements IBaseEnum<Integer> {
     @Getter
     private String label;
 
-    UserTypeEnum(Integer value, String label) {
+    @Getter
+    private String code;
+
+    UserTypeEnum(Integer value, String label, String code) {
         this.value = value;
         this.label = label;
+        this.code = code;
     }
 
 }

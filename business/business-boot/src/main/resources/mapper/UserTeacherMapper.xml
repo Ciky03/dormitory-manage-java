@@ -36,4 +36,43 @@
         order by t.create_time desc
     </select>
 
+    <!--UserTeacherForm参数映射-->
+    <resultMap id="teacherFormResultMap" type="cloud.ciky.business.model.form.UserTeacherForm">
+        <!--user_teacher表字段-->
+        <id property="id" column="teacher_id"/>
+        <result property="realName" column="teacher_real_name"/>
+        <result property="teacherNum" column="teacher_num"/>
+        <result property="entryDate" column="entry_date"/>
+        <!--sys_user表字段-->
+        <association property="userForm" javaType="cloud.ciky.system.model.form.UserForm">
+            <id property="id" column="user_id"/>
+            <result property="username" column="username"/>
+            <result property="nickname" column="nickname"/>
+            <result property="realName" column="user_real_name"/>
+            <result property="userType" column="user_type"/>
+            <result property="phone" column="phone"/>
+            <result property="email" column="email"/>
+        </association>
+    </resultMap>
+
+    <!-- 获取教师表单 -->
+    <select id="selectTeacherForm" resultMap="teacherFormResultMap">
+        select t.id        as teacher_id,
+               t.real_name as teacher_real_name,
+               t.teacher_num,
+               t.entry_date,
+               u.id        as user_id,
+               u.username,
+               u.nickname,
+               u.real_name as user_real_name,
+               u.user_type,
+               u.phone,
+               u.email
+        from dm_business.user_teacher t
+                 left join dm_system.sys_user u on u.business_user_id = t.id and u.delflag = 0
+            and u.user_type = ${@cloud.ciky.system.enums.UserTypeEnum@TEACHER.getValue()}
+        where t.id = #{id}
+          and t.delflag = 0
+    </select>
+
 </mapper>

@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.boot.autoconfigure.task.TaskSchedulingProperties;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -188,4 +189,12 @@ public class UserController {
         return Result.judge(result);
     }
 
+    @Operation(summary = "业务账号解绑")
+    @Log(value = "业务账号解绑", module = LogModuleEnum.USER)
+    @PutMapping("/internal/unbind/business")
+    @RepeatSubmit
+    public Result<Boolean> unbindBusiness(@RequestParam String businessUserId) {
+        boolean result = userService.unbindBusiness(businessUserId);
+        return Result.success(result);
+    }
 }

@@ -1,6 +1,7 @@
 package cloud.ciky.business.mapper;
 
 import cloud.ciky.business.model.entity.UserStudent;
+import cloud.ciky.business.model.form.UserStudentForm;
 import cloud.ciky.business.model.query.StudentPageQuery;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -30,4 +31,16 @@ public interface UserStudentMapper extends BaseMapper<UserStudent> {
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.StudentPageVO>
      */
     Page<StudentPageVO> selectStudentPage(Page<Object> objectPage, StudentPageQuery query);
+
+    /**
+     * <p>
+     * 获取学生表单
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return cloud.ciky.business.model.form.UserStudentForm
+     */
+    UserStudentForm selectStudentForm(String id);
 }

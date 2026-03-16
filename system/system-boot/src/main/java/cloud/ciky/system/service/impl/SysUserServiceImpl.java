@@ -1,6 +1,7 @@
 package cloud.ciky.system.service.impl;
 
 import cloud.ciky.base.BaseQuery;
+import cloud.ciky.base.IBaseEnum;
 import cloud.ciky.base.constant.RedisConstants;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.base.model.Option;
@@ -11,6 +12,7 @@ import cloud.ciky.file.service.impl.MinioOssService;
 import cloud.ciky.mail.service.MailService;
 import cloud.ciky.security.service.PermissionService;
 import cloud.ciky.security.util.SecurityUtils;
+import cloud.ciky.system.enums.UserTypeEnum;
 import cloud.ciky.system.model.dto.UserAuthDTO;
 import cloud.ciky.system.model.entity.SysAttach;
 import cloud.ciky.system.model.entity.SysUser;
@@ -20,10 +22,7 @@ import cloud.ciky.system.model.form.PwdUpdateForm;
 import cloud.ciky.system.model.form.UserForm;
 import cloud.ciky.system.model.query.UserPageVO;
 import cloud.ciky.system.model.vo.UserInfoVO;
-import cloud.ciky.system.service.SysAttachService;
-import cloud.ciky.system.service.SysRoleMenuService;
-import cloud.ciky.system.service.SysUserRoleService;
-import cloud.ciky.system.service.SysUserService;
+import cloud.ciky.system.service.*;
 import cloud.ciky.system.util.PasswordGenerator;
 import cn.hutool.core.annotation.scanner.FieldAnnotationScanner;
 import cn.hutool.core.collection.CollUtil;
@@ -47,6 +46,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -65,6 +65,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private final PermissionService permissionService;
     private final SysRoleMenuService roleMenuService;
+    private final SysRoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final SysUserRoleService userRoleService;
     private final MailService mailService;
@@ -189,6 +190,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         String optUser = SecurityUtils.getUserId();
         String password = formData.getPassword();
         String realName = formData.getRealName();
+        Integer userType = formData.getUserType();
         boolean userIdExisted = CharSequenceUtil.isNotBlank(id);
 
         // 判断密码
@@ -239,16 +241,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             entity.setPassword(passwordEncoder.encode(password));
         }
         if (CharSequenceUtil.isNotBlank(realName)) {
-            entity.setNickname(PinyinUtil.getPinyin(realName,""));
+            entity.setNickname(PinyinUtil.getPinyin(realName, ""));
             entity.setRealName(realName);
         }
         entity.setUsername(formData.getUsername());
         entity.setPhone(formData.getPhone());
         entity.setEmail(formData.getEmail());
-        entity.setUserType(formData.getUserType());
+        entity.setUserType(userType);
         entity.setBusinessUserId(formData.getBusinessUserId());
         entity.setStatus(true);
         boolean result = this.saveOrUpdate(entity);
+
+        // 学生/教师/宿管
+        if (UserTypeEnum.STUDENT.getValue().equals(userType)
+                || UserTypeEnum.TEACHER.getValue().equals(userType)
+                || UserTypeEnum.DORMITORY_MANAGER.getValue().equals(userType)) {
+            String roleCode = IBaseEnum.getEnumByValue(userType, UserTypeEnum.class).getCode();
+            formData.setRoleIds(Collections.singletonList(roleService.getRoleIdByCode(roleCode)));
+        }
 
         // 保存用户角色
         if (result) {
@@ -399,5 +409,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .eq(SysUser::getId, userId);
 
         return this.update(wrapper);
+    }
+
+    @Override
+    public boolean unbindBusiness(String businessUserId) {
+        String optUser = SecurityUtils.getUserId();
+        // 不清空business_user_id, 保留原记录
+        return this.update(new LambdaUpdateWrapper<SysUser>()
+                .setSql("history_user_type = user_type")
+                .set(SysUser::getUserType, UserTypeEnum.OTHER.getValue())
+                .set(SysUser::getUpdateBy, optUser)
+                .set(SysUser::getUpdateTime, LocalDateTime.now())
+                .eq(SysUser::getBusinessUserId, businessUserId));
     }
 }

@@ -2,6 +2,7 @@ package cloud.ciky.business.mapper;
 
 import cloud.ciky.base.BaseQuery;
 import cloud.ciky.business.model.entity.UserTeacher;
+import cloud.ciky.business.model.form.UserTeacherForm;
 import cloud.ciky.business.model.vo.TeacherPageVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,4 +31,16 @@ public interface UserTeacherMapper extends BaseMapper<UserTeacher> {
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.TeacherPageVO>
      */
     Page<TeacherPageVO> selectTeacherPage(Page<Object> objectPage, BaseQuery query);
+
+    /**
+     * <p>
+     * 获取教师表单
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return cloud.ciky.business.model.form.UserTeacherForm
+     */
+    UserTeacherForm selectTeacherForm(String id);
 }

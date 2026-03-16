@@ -31,6 +31,30 @@ public interface UserDormitoryManagerService extends IService<UserDormitoryManag
 
     /**
      * <p>
+     * 获取宿管表单
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return cloud.ciky.business.model.form.UserDormitoryManagerForm
+     */
+    UserDormitoryManagerForm getDormitoryManagerForm(String id);
+
+    /**
+     * <p>
+     * 删除宿管
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param id 主键
+     * @return boolean
+     */
+    boolean deleteDormitoryManager(String id);
+
+    /**
+     * <p>
      * 保存宿管
      * </p>
      *

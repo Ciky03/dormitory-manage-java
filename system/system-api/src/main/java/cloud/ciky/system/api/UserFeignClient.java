@@ -39,5 +39,8 @@ public interface UserFeignClient {
     @PostMapping("/user/add")
     Result<Boolean> addUser(@Validated @RequestBody UserForm userForm);
 
+    @PutMapping("/user/internal/unbind/business")
+    Result<Boolean> unbindBusiness(@RequestParam String businessUserId);
+
 
 }
