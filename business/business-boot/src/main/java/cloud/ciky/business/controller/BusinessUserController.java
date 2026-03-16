@@ -49,25 +49,11 @@ public class BusinessUserController {
         return PageResult.success(page);
     }
 
-    @Operation(summary = "获取学生表单")
-    @GetMapping("/student/form/{id}")
-    public Result<UserStudentForm> getStudentForm(@PathVariable String id) {
-        UserStudentForm form = studentService.getStudentForm(id);
-        return Result.success(form);
-    }
-
     @Operation(summary = "获取教师分页列表")
     @GetMapping("/teacher/list")
     public PageResult<TeacherPageVO> listTeacher(@ParameterObject BaseQuery query) {
         Page<TeacherPageVO> page = teacherService.listTeacher(query);
         return PageResult.success(page);
-    }
-
-    @Operation(summary = "获取教师表单")
-    @GetMapping("/teacher/form/{id}")
-    public Result<UserTeacherForm> getTeacherForm(@PathVariable String id) {
-        UserTeacherForm form = teacherService.getTeacherForm(id);
-        return Result.success(form);
     }
 
     @Operation(summary = "获取宿管分页列表")
@@ -77,35 +63,25 @@ public class BusinessUserController {
         return PageResult.success(page);
     }
 
+    @Operation(summary = "获取学生表单")
+    @GetMapping("/student/form/{id}")
+    public Result<UserStudentForm> getStudentForm(@PathVariable String id) {
+        UserStudentForm form = studentService.getStudentForm(id);
+        return Result.success(form);
+    }
+
+    @Operation(summary = "获取教师表单")
+    @GetMapping("/teacher/form/{id}")
+    public Result<UserTeacherForm> getTeacherForm(@PathVariable String id) {
+        UserTeacherForm form = teacherService.getTeacherForm(id);
+        return Result.success(form);
+    }
+
     @Operation(summary = "获取宿管表单")
     @GetMapping("/dm/form/{id}")
     public Result<UserDormitoryManagerForm> getDormitoryManagerForm(@PathVariable String id) {
         UserDormitoryManagerForm form = dormitoryManagerService.getDormitoryManagerForm(id);
         return Result.success(form);
-    }
-
-    @Operation(summary = "删除学生")
-    @Log(value = "删除学生", module = LogModuleEnum.STUDENT)
-    @DeleteMapping("/student/del/{id}")
-    public Result<Void> deleteStudent(@PathVariable String id) {
-        boolean result = studentService.deleteStudent(id);
-        return Result.judge(result);
-    }
-
-    @Operation(summary = "删除教师")
-    @Log(value = "删除教师", module = LogModuleEnum.TEACHER)
-    @DeleteMapping("/teacher/del/{id}")
-    public Result<Void> deleteTeacher(@PathVariable String id) {
-        boolean result = teacherService.deleteTeacher(id);
-        return Result.judge(result);
-    }
-
-    @Operation(summary = "删除宿管")
-    @Log(value = "删除宿管", module = LogModuleEnum.DORMITORY_MANAGER)
-    @DeleteMapping("/dm/del/{id}")
-    public Result<Void> deleteDormitoryManager(@PathVariable String id) {
-        boolean result = dormitoryManagerService.deleteDormitoryManager(id);
-        return Result.judge(result);
     }
 
     @Operation(summary = "新增学生")
@@ -167,4 +143,29 @@ public class BusinessUserController {
         boolean result = dormitoryManagerService.saveDormitoryManager(form);
         return Result.judge(result);
     }
+
+    @Operation(summary = "删除学生")
+    @Log(value = "删除学生", module = LogModuleEnum.STUDENT)
+    @DeleteMapping("/student/del/{id}")
+    public Result<Void> deleteStudent(@PathVariable String id) {
+        boolean result = studentService.deleteStudent(id);
+        return Result.judge(result);
+    }
+
+    @Operation(summary = "删除教师")
+    @Log(value = "删除教师", module = LogModuleEnum.TEACHER)
+    @DeleteMapping("/teacher/del/{id}")
+    public Result<Void> deleteTeacher(@PathVariable String id) {
+        boolean result = teacherService.deleteTeacher(id);
+        return Result.judge(result);
+    }
+
+    @Operation(summary = "删除宿管")
+    @Log(value = "删除宿管", module = LogModuleEnum.DORMITORY_MANAGER)
+    @DeleteMapping("/dm/del/{id}")
+    public Result<Void> deleteDormitoryManager(@PathVariable String id) {
+        boolean result = dormitoryManagerService.deleteDormitoryManager(id);
+        return Result.judge(result);
+    }
+
 }
