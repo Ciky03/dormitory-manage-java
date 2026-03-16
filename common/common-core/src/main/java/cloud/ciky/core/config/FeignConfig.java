@@ -4,6 +4,7 @@ package cloud.ciky.core.config;
 import cloud.ciky.security.util.SecurityUtils;
 import feign.RequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,10 @@ import java.util.Enumeration;
 
 @Configuration
 public class FeignConfig {
+
+    @Value("${internal.token}")
+    private String internalToken;
+
     /**
      * 让DispatcherServlet向子线程传递RequestContext
      *
@@ -44,6 +49,8 @@ public class FeignConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return (template) -> {
+            // 给feign内部调用的接口加上指定请求头
+            template.header("X-Internal-Token", internalToken);
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
                 ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
