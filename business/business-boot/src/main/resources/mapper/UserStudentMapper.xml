@@ -21,4 +21,22 @@
         id, real_name, student_num, admission_year, graduation_year, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <!-- 获取学生分页列表 -->
+    <select id="selectStudentPage" resultType="cloud.ciky.business.model.vo.StudentPageVO">
+        select
+            s.id,
+            s.real_name as realName,
+            s.student_num as studentNum,
+            null as className,
+            s.admission_year as admissionYear,
+            s.graduation_year as graduationYear
+        from user_student s
+        where s.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (s.real_name like concat('%', #{query.keywords}, '%')
+                or s.student_num like concat('%', #{query.keywords}, '%'))
+        </if>
+        order by s.create_time desc
+    </select>
+
 </mapper>

@@ -1,10 +1,12 @@
 package cloud.ciky.business.service.impl;
 
+import cloud.ciky.base.BaseQuery;
 import cloud.ciky.base.enums.DelflagEnum;
 import cloud.ciky.base.exception.BusinessException;
-import cloud.ciky.business.model.entity.UserDormitoryManager;
 import cloud.ciky.business.mapper.UserDormitoryManagerMapper;
+import cloud.ciky.business.model.entity.UserDormitoryManager;
 import cloud.ciky.business.model.form.UserDormitoryManagerForm;
+import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
 import cloud.ciky.business.service.UserDormitoryManagerService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
@@ -12,6 +14,7 @@ import cloud.ciky.system.enums.UserTypeEnum;
 import cloud.ciky.system.model.form.UserForm;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDormitoryManagerServiceImpl extends ServiceImpl<UserDormitoryManagerMapper, UserDormitoryManager> implements UserDormitoryManagerService {
 
     private final UserFeignClient userFeignClient;
+
+    @Override
+    public Page<DormitoryManagerPageVO> listDormitoryManager(BaseQuery query) {
+        return this.baseMapper.selectDormitoryManagerPage(new Page<>(query.getPageNum(), query.getPageSize()), query);
+    }
 
     @Override
     @Transactional

@@ -1,7 +1,10 @@
 package cloud.ciky.business.service;
 
+import cloud.ciky.base.BaseQuery;
 import cloud.ciky.business.model.entity.UserTeacher;
 import cloud.ciky.business.model.form.UserTeacherForm;
+import cloud.ciky.business.model.vo.TeacherPageVO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,6 +16,18 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2026-03-14 11:40:01
  */
 public interface UserTeacherService extends IService<UserTeacher> {
+
+    /**
+     * <p>
+     * 获取教师分页列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/16 16:21
+     * @param query 查询对象
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.TeacherPageVO>
+     */
+    Page<TeacherPageVO> listTeacher(BaseQuery query);
 
     /**
      * <p>

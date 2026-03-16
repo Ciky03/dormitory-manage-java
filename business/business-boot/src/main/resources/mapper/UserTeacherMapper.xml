@@ -20,4 +20,20 @@
         id, real_name, teacher_num, entry_date, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <!-- 获取教师分页列表 -->
+    <select id="selectTeacherPage" resultType="cloud.ciky.business.model.vo.TeacherPageVO">
+        select
+            t.id,
+            t.real_name as realName,
+            t.teacher_num as teacherNum,
+            t.entry_date as entryDate
+        from user_teacher t
+        where t.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (t.real_name like concat('%', #{query.keywords}, '%')
+                or t.teacher_num like concat('%', #{query.keywords}, '%'))
+        </if>
+        order by t.create_time desc
+    </select>
+
 </mapper>

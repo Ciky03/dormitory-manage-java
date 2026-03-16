@@ -20,4 +20,20 @@
         id, real_name, dm_num, entry_date, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <!-- 获取宿管分页列表 -->
+    <select id="selectDormitoryManagerPage" resultType="cloud.ciky.business.model.vo.DormitoryManagerPageVO">
+        select
+            dm.id,
+            dm.real_name as realName,
+            dm.dm_num as dmNum,
+            dm.entry_date as entryDate
+        from user_dormitory_manager dm
+        where dm.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (dm.real_name like concat('%', #{query.keywords}, '%')
+                or dm.dm_num like concat('%', #{query.keywords}, '%'))
+        </if>
+        order by dm.create_time desc
+    </select>
+
 </mapper>
