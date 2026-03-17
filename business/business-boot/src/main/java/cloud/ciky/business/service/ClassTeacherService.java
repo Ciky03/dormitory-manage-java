@@ -1,6 +1,7 @@
 package cloud.ciky.business.service;
 
 import cloud.ciky.business.model.entity.ClassTeacher;
+import cloud.ciky.business.model.form.ClassTeacherForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -24,5 +25,17 @@ public interface ClassTeacherService extends IService<ClassTeacher> {
      * @return java.lang.String
      */
     String getSelectedClassId(String teacherId);
+
+    /**
+     * <p>
+     * 保存班级教师信息
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/17 18:28
+     * @param form 表单对象
+     * @return boolean
+     */
+    boolean saveClassTeacher(ClassTeacherForm form);
 
 }

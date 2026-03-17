@@ -1,6 +1,7 @@
 package cloud.ciky.business.service;
 
 import cloud.ciky.business.model.entity.ClassStudent;
+import cloud.ciky.business.model.form.ClassStudentForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -24,5 +25,17 @@ public interface ClassStudentService extends IService<ClassStudent> {
      * @return java.lang.String
      */
     String getSelectedClassId(String studentId);
+
+    /**
+     * <p>
+     * 保存班级学生信息
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/17 18:20
+     * @param form 表单对象
+     * @return boolean
+     */
+    boolean saveClassStudent(ClassStudentForm form);
 
 }
