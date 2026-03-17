@@ -5,6 +5,7 @@ import cloud.ciky.base.result.PageResult;
 import cloud.ciky.base.result.Result;
 import cloud.ciky.business.model.form.EduUnitForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
+import cloud.ciky.business.model.query.UnitQuery;
 import cloud.ciky.business.model.vo.ClassPageVO;
 import cloud.ciky.business.model.vo.EduUnitVO;
 import cloud.ciky.core.annotation.Log;
@@ -39,10 +40,10 @@ public class EduUnitController {
 
     private final EduUnitService eduUnitService;
 
-    @Operation(summary = "获取学院/专业树")
+    @Operation(summary = "获取学院/专业/班级树")
     @GetMapping("/tree/list")
-    public Result<List<EduUnitVO>> listCollegeMajorTree() {
-        List<EduUnitVO> menuList = eduUnitService.listCollegeMajorTree();
+    public Result<List<EduUnitVO>> listUnitTree(@ParameterObject UnitQuery query) {
+        List<EduUnitVO> menuList = eduUnitService.listUnitTree(query);
         return Result.success(menuList);
     }
 

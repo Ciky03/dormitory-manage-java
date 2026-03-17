@@ -4,6 +4,7 @@ import cloud.ciky.base.result.PageResult;
 import cloud.ciky.business.model.entity.EduUnit;
 import cloud.ciky.business.model.form.EduUnitForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
+import cloud.ciky.business.model.query.UnitQuery;
 import cloud.ciky.business.model.vo.ClassPageVO;
 import cloud.ciky.business.model.vo.EduUnitVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,14 +24,15 @@ public interface EduUnitService extends IService<EduUnit> {
 
     /**
      * <p>
-     * 获取学院/专业列表树
+     * 获取学院/专业/班级列表树
      * </p>
      *
      * @author ciky
      * @since 2026/2/5 17:27
+     * @param query 查询对象
      * @return java.util.List<cloud.ciky.business.model.vo.EduUnitVO>
      */
-    List<EduUnitVO> listCollegeMajorTree();
+    List<EduUnitVO> listUnitTree(UnitQuery query);
 
     /**
      * <p>

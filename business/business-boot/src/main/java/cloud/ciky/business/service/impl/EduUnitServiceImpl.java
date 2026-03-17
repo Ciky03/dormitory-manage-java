@@ -5,12 +5,17 @@ import cloud.ciky.base.constant.SystemConstants;
 import cloud.ciky.base.enums.DelflagEnum;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.business.enums.EduUnitTypeEnum;
+import cloud.ciky.business.model.entity.ClassStudent;
+import cloud.ciky.business.model.entity.ClassTeacher;
 import cloud.ciky.business.model.entity.EduUnit;
 import cloud.ciky.business.mapper.EduUnitMapper;
 import cloud.ciky.business.model.form.EduUnitForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
+import cloud.ciky.business.model.query.UnitQuery;
 import cloud.ciky.business.model.vo.ClassPageVO;
 import cloud.ciky.business.model.vo.EduUnitVO;
+import cloud.ciky.business.service.ClassStudentService;
+import cloud.ciky.business.service.ClassTeacherService;
 import cloud.ciky.business.service.EduUnitService;
 import cloud.ciky.security.util.SecurityUtils;
 import cn.hutool.core.collection.CollUtil;
@@ -27,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,15 +50,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> implements EduUnitService {
 
+    private final ClassStudentService classStudentService;
+    private final ClassTeacherService classTeacherService;
+
     @Override
-    public List<EduUnitVO> listCollegeMajorTree() {
-        // 查询type为1/2 (学院/专业)
+    public List<EduUnitVO> listUnitTree(UnitQuery query) {
+        Boolean queryAll = query.getQueryAll();
+        String studentId = query.getStudentId();
+        String teacherId = query.getTeacherId();
+
         List<EduUnit> units = this.list(new LambdaQueryWrapper<EduUnit>()
-                .and(wrapper -> wrapper.eq(EduUnit::getType, EduUnitTypeEnum.COLLEGE.getValue())
-                        .or()
-                        .eq(EduUnit::getType, EduUnitTypeEnum.MAJOR.getValue()))
+                .and(queryAll == null || !queryAll,
+                        wrapper -> wrapper.eq(EduUnit::getType, EduUnitTypeEnum.COLLEGE.getValue())
+                                .or()
+                                .eq(EduUnit::getType, EduUnitTypeEnum.MAJOR.getValue()))
                 .eq(EduUnit::getDelflag, DelflagEnum.USABLE.getValue())
                 .orderByAsc(EduUnit::getCreateTime));
+
+        // 查询已经被选择的班级
+        String selectedClassId = null;
+        if (CharSequenceUtil.isNotBlank(studentId)) {
+            selectedClassId = classStudentService.getSelectedClassId(studentId);
+        }
+        if (CharSequenceUtil.isNotBlank(teacherId)) {
+            selectedClassId = classTeacherService.getSelectedClassId(teacherId);
+        }
+
 
         Set<String> parentIds = units.stream()
                 .map(EduUnit::getParentId)
@@ -66,8 +90,9 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
                 .filter(id -> !unitIds.contains(id))
                 .toList();
 
+        String finalSelectedClassId = selectedClassId;
         return rootIds.stream()
-                .flatMap(rootId -> buildUnitTree(rootId, units).stream())
+                .flatMap(rootId -> buildUnitTree(rootId, units, finalSelectedClassId).stream())
                 .toList();
     }
 
@@ -78,10 +103,11 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
      *
      * @param parentId 父id
      * @param unitList 学院/专业列表
+     * @param selectedClassId 选中的班级id
      * @author ciky
      * @since 2026/2/5 17:33
      */
-    private List<EduUnitVO> buildUnitTree(String parentId, List<EduUnit> unitList) {
+    private List<EduUnitVO> buildUnitTree(String parentId, List<EduUnit> unitList, String selectedClassId) {
         return CollUtil.emptyIfNull(unitList)
                 .stream()
                 .filter(unit -> unit.getParentId().equals(parentId))
@@ -92,7 +118,8 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
                     vo.setTreePath(entity.getTreePath());
                     vo.setName(entity.getName());
                     vo.setType(entity.getType());
-                    List<EduUnitVO> children = buildUnitTree(entity.getId(), unitList);
+                    vo.setSelected(Objects.equals(entity.getId(), selectedClassId));
+                    List<EduUnitVO> children = buildUnitTree(entity.getId(), unitList, selectedClassId);
                     vo.setChildren(children);
                     return vo;
                 }).toList();

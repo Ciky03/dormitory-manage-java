@@ -32,6 +32,9 @@ public class EduUnitVO {
     @Schema(description="类型（1-学院 2-专业 3-班级）")
     private Integer type;
 
+    @Schema(description = "是否已选择(1-已选择 2-未选择)")
+    private Boolean selected;
+
     @Schema(description = "子菜单")
     private List<EduUnitVO> children;
 }
