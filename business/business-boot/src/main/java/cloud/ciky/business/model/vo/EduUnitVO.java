@@ -26,6 +26,9 @@ public class EduUnitVO {
     @Schema(description = "父路径")
     private String treePath;
 
+    @Schema(description = "年级(仅班级可用)")
+    private String gradeYear;
+
     @Schema(description = "名称")
     private String name;
 

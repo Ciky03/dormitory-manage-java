@@ -65,7 +65,7 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
                                 .or()
                                 .eq(EduUnit::getType, EduUnitTypeEnum.MAJOR.getValue()))
                 .eq(EduUnit::getDelflag, DelflagEnum.USABLE.getValue())
-                .orderByAsc(EduUnit::getCreateTime));
+                .orderByAsc(EduUnit::getGradeYear, EduUnit::getName, EduUnit::getCreateTime));
 
         // 查询已经被选择的班级
         String selectedClassId = null;
@@ -112,12 +112,15 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
                 .stream()
                 .filter(unit -> unit.getParentId().equals(parentId))
                 .map(entity -> {
+                    Integer type = entity.getType();
+                    String name = entity.getName();
+
                     EduUnitVO vo = new EduUnitVO();
                     vo.setId(entity.getId());
                     vo.setParentId(entity.getParentId());
                     vo.setTreePath(entity.getTreePath());
-                    vo.setName(entity.getName());
-                    vo.setType(entity.getType());
+                    vo.setName(type.equals(EduUnitTypeEnum.CLASS.getValue()) ? entity.getGradeYear() + name : name);
+                    vo.setType(type);
                     vo.setSelected(Objects.equals(entity.getId(), selectedClassId));
                     List<EduUnitVO> children = buildUnitTree(entity.getId(), unitList, selectedClassId);
                     vo.setChildren(children);
