@@ -31,13 +31,16 @@
                college.name as collegeName,
                major.id as majorId,
                major.name   as majorName,
+               t.real_name as headTeacher,
                class.create_time
         from edu_unit class
                  left join edu_unit college
                            on find_in_set(college.id, class.tree_path) and college.type = 1 and college.delflag = 0
                  left join edu_unit major
                            on major.id = class.parent_id and major.type = 2 and major.delflag = 0
-        where class.type = 3
+                left join class_teacher ct on ct.class_id = class.id and ct.is_current = 1
+                left join user_teacher t on t.id = ct.teacher_id and t.delflag = 0
+        where class.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
              and class.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
              and (class.name like concat('%', #{query.keywords}, '%')
@@ -57,8 +60,14 @@
             edu.parent_id,
             edu.name,
             edu.type as eduType,
-            edu.grade_year
+            edu.grade_year,
+            t.id        as headTeacherId,
+            t.real_name as headTeacher
         from edu_unit edu
+             left join class_teacher ct on ct.class_id = edu.id and ct.is_current = 1
+                and edu.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
+             left join user_teacher t on t.id = ct.teacher_id and t.delflag = 0
+                and edu.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
         where edu.id = #{id} and edu.delflag = 0
     </select>
 

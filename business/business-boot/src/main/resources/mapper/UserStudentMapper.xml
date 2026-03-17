@@ -27,10 +27,12 @@
             s.id,
             s.real_name as realName,
             s.student_num as studentNum,
-            null as className,
+            concat(eu.grade_year, eu.name) as className,
             s.admission_year as admissionYear,
             s.graduation_year as graduationYear
         from user_student s
+            left join class_student cs on cs.student_id = s.id and cs.is_current = 1
+            left join edu_unit eu on eu.id = cs.class_id and eu.delflag = 0
         where s.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
             and (s.real_name like concat('%', #{query.keywords}, '%')

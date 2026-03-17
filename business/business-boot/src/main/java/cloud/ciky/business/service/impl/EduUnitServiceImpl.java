@@ -9,6 +9,7 @@ import cloud.ciky.business.model.entity.ClassStudent;
 import cloud.ciky.business.model.entity.ClassTeacher;
 import cloud.ciky.business.model.entity.EduUnit;
 import cloud.ciky.business.mapper.EduUnitMapper;
+import cloud.ciky.business.model.form.ClassTeacherForm;
 import cloud.ciky.business.model.form.EduUnitForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
 import cloud.ciky.business.model.query.UnitQuery;
@@ -29,6 +30,7 @@ import com.ibm.icu.text.UFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -134,6 +136,7 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveUnit(EduUnitForm form) {
         String id = form.getId();
         String parentId = form.getParentId();
@@ -173,10 +176,16 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         entity.setGradeYear(gradeYear);
         String treePath = generateUnitTreePath(parentId);
         entity.setTreePath(treePath);
+        boolean saved = this.saveOrUpdate(entity);
 
-        // TODO 保存教师-班级关系
-
-        return this.saveOrUpdate(entity);
+        if(saved) {
+            // 保存教师-班级关系
+            ClassTeacherForm classTeacherForm = new ClassTeacherForm();
+            classTeacherForm.setClassId(entity.getId());
+            classTeacherForm.setTeacherId(form.getHeadTeacherId());
+            saved = classTeacherService.saveClassTeacher(classTeacherForm);
+        }
+        return saved;
     }
 
 
@@ -198,7 +207,6 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
 
     @Override
     public EduUnitForm getUnitForm(String id) {
-        // TODO 回显班主任信息
         return this.baseMapper.selectUnitForm(id);
     }
 

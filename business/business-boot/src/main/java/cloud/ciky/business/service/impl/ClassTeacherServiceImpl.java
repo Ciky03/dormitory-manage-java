@@ -5,6 +5,7 @@ import cloud.ciky.business.model.form.ClassTeacherForm;
 import cloud.ciky.business.mapper.ClassTeacherMapper;
 import cloud.ciky.business.service.ClassTeacherService;
 import cloud.ciky.security.util.SecurityUtils;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -48,7 +49,7 @@ public class ClassTeacherServiceImpl extends ServiceImpl<ClassTeacherMapper, Cla
                 .set(ClassTeacher::getEndTime, now)
                 .set(ClassTeacher::getUpdateBy, userId)
                 .set(ClassTeacher::getUpdateTime, now)
-                .eq(ClassTeacher::getTeacherId, teacherId)
+                .eq(ClassTeacher::getClassId, classId) // 保存原班级的班主任信息
                 .eq(ClassTeacher::getIsCurrent, true));
 
         ClassTeacher entity = new ClassTeacher();
