@@ -27,7 +27,8 @@
             t.real_name as realName,
             t.teacher_num as teacherNum,
             t.entry_date as entryDate,
-            group_concat(concat(c.grade_year, c.name) order by c.grade_year, c.name) as teachingClass
+            group_concat(concat(ifnull(c.grade_year, ''), ifnull(c.name, ''))
+                         order by c.grade_year, c.name) as teachingClass
         from user_teacher t
             left join class_teacher ct on ct.teacher_id = t.id and ct.is_current = 1
             left join edu_unit c on c.id = ct.class_id and c.delflag = 0

@@ -27,6 +27,9 @@ public class StudentPageVO {
     @Schema(description = "班级")
     private String className;
 
+    @Schema(description = "宿舍")
+    private String roomName;
+
     @Schema(description = "入学年份")
     private Integer admissionYear;
 
