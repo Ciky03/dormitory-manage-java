@@ -28,6 +28,9 @@ public class TeacherPageVO {
     @Schema(description = "工号")
     private String teacherNum;
 
+    @Schema(description = "任教班级")
+    private String teachingClass;
+
     @Schema(description = "入职日期")
     @JsonFormat(pattern = DateFormatConstants.FORMAT8)
     private LocalDate entryDate;

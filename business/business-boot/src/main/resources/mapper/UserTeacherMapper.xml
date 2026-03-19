@@ -26,13 +26,18 @@
             t.id,
             t.real_name as realName,
             t.teacher_num as teacherNum,
-            t.entry_date as entryDate
+            t.entry_date as entryDate,
+            group_concat(concat(c.grade_year, c.name) order by c.grade_year, c.name) as teachingClass
         from user_teacher t
+            left join class_teacher ct on ct.teacher_id = t.id and ct.is_current = 1
+            left join edu_unit c on c.id = ct.class_id and c.delflag = 0
+                and c.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
         where t.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
             and (t.real_name like concat('%', #{query.keywords}, '%')
                 or t.teacher_num like concat('%', #{query.keywords}, '%'))
         </if>
+        group by t.id
         order by t.create_time desc
     </select>
 
