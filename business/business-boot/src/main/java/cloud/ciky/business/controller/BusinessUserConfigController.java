@@ -4,13 +4,16 @@ import cloud.ciky.base.enums.LogModuleEnum;
 import cloud.ciky.base.result.Result;
 import cloud.ciky.business.model.form.ClassStudentForm;
 import cloud.ciky.business.model.form.ClassTeacherForm;
+import cloud.ciky.business.service.BuildingDmService;
 import cloud.ciky.business.service.ClassTeacherService;
 import cloud.ciky.business.service.ClassStudentService;
+import cloud.ciky.business.service.RoomStudentService;
 import cloud.ciky.core.annotation.Log;
 import cloud.ciky.core.annotation.RepeatSubmit;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 public class BusinessUserConfigController {
 
     private final ClassStudentService classStudentService;
+    private final BuildingDmService buildingDmService;
+    private final RoomStudentService roomStudentService;
 
     @Operation(summary = "保存班级学生信息")
     @Log(value = "保存班级学生信息", module = LogModuleEnum.STUDENT)
