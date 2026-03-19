@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="room_id" property="roomId" />
         <result column="student_id" property="studentId" />
-        <result column="is_current" property="current" />
+        <result column="is_current" property="isCurrent" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />
         <result column="create_by" property="createBy" />

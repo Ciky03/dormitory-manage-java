@@ -3,7 +3,7 @@ package cloud.ciky.business.controller;
 import cloud.ciky.base.enums.LogModuleEnum;
 import cloud.ciky.base.result.Result;
 import cloud.ciky.business.model.form.ClassStudentForm;
-import cloud.ciky.business.model.form.ClassTeacherForm;
+import cloud.ciky.business.model.form.RoomStudentForm;
 import cloud.ciky.business.service.BuildingDmService;
 import cloud.ciky.business.service.ClassTeacherService;
 import cloud.ciky.business.service.ClassStudentService;
@@ -41,6 +41,15 @@ public class BusinessUserConfigController {
     @PostMapping("/class/student/add")
     public Result<Void> saveClassStudent(@Validated @RequestBody ClassStudentForm form) {
         boolean result = classStudentService.saveClassStudent(form);
+        return Result.judge(result);
+    }
+
+    @Operation(summary = "保存学生宿舍信息")
+    @Log(value = "保存学生宿舍信息", module = LogModuleEnum.STUDENT)
+    @RepeatSubmit
+    @PostMapping("/room/student/add")
+    public Result<Void> saveRoomStudent(@Validated @RequestBody RoomStudentForm form) {
+        boolean result = roomStudentService.saveRoomStudent(form);
         return Result.judge(result);
     }
 

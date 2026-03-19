@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="building_id" property="buildingId" />
         <result column="dm_id" property="dmId" />
-        <result column="is_current" property="current" />
+        <result column="is_current" property="isCurrent" />
         <result column="start_time" property="startTime" />
         <result column="end_time" property="endTime" />
         <result column="create_by" property="createBy" />

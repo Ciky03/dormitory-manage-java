@@ -13,4 +13,16 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface BuildingDmService extends IService<BuildingDm> {
 
+    /**
+     * <p>
+     * 获取当前宿管负责楼栋
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/19 17:04
+     * @param dmId 宿管id
+     * @return java.lang.String
+     */
+    String getSelectedBuildingId(String dmId);
+
 }

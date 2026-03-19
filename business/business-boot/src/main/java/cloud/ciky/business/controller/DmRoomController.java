@@ -9,6 +9,8 @@ import cloud.ciky.base.result.Result;
 import cloud.ciky.business.model.entity.DmRoom;
 import cloud.ciky.business.model.form.DmRoomForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
+import cloud.ciky.business.model.query.RoomTreeQuery;
+import cloud.ciky.business.model.vo.DmRoomTreeVO;
 import cloud.ciky.business.model.vo.RoomPageVO;
 import cloud.ciky.business.service.DmRoomService;
 import cloud.ciky.core.annotation.Log;
@@ -39,11 +41,11 @@ public class DmRoomController {
 
     private final DmRoomService roomService;
 
-    @Operation(summary = "获取楼栋列表")
-    @GetMapping("/building/list")
-    public Result<List<KeyValue>> listBuilding() {
-        List<KeyValue> roomPage = roomService.listBuilding();
-        return Result.success(roomPage);
+    @Operation(summary = "获取楼栋/宿舍树")
+    @GetMapping("/tree/list")
+    public Result<List<DmRoomTreeVO>> listBuildingRoomTree(@ParameterObject RoomTreeQuery query) {
+        List<DmRoomTreeVO> treeList = roomService.listBuildingRoomTree(query);
+        return Result.success(treeList);
     }
 
     @Operation(summary = "获取宿舍分页列表")

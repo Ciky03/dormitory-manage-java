@@ -5,6 +5,8 @@ import cloud.ciky.base.model.KeyValue;
 import cloud.ciky.business.model.entity.DmRoom;
 import cloud.ciky.business.model.form.DmRoomForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
+import cloud.ciky.business.model.query.RoomTreeQuery;
+import cloud.ciky.business.model.vo.DmRoomTreeVO;
 import cloud.ciky.business.model.vo.RoomPageVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -23,14 +25,14 @@ public interface DmRoomService extends IService<DmRoom> {
 
     /**
      * <p>
-     * 获取楼栋列表 (key:id, value:楼栋名)
+     * 获取楼栋/宿舍树
      * </p>
      *
      * @author ciky
-     * @since 2026/3/11 17:43
-     * @return java.util.List<cloud.ciky.base.model.KeyValue>
+     * @since 2026/3/19 17:04
+     * @return java.util.List<cloud.ciky.business.model.vo.DmRoomTreeVO>
      */
-    List<KeyValue> listBuilding();
+    List<DmRoomTreeVO> listBuildingRoomTree(RoomTreeQuery query);
 
     /**
      * <p>

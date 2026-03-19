@@ -47,7 +47,7 @@ public class BuildingDm implements Serializable {
      * 是否当前宿管(1-当前 0-历史)
      */
     @TableField("is_current")
-    private Boolean current;
+    private Boolean isCurrent;
 
     /**
      * 任职开始时间

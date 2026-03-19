@@ -47,7 +47,7 @@ public class RoomStudent implements Serializable {
      * 是否当前宿舍(1-当前 0-历史)
      */
     @TableField("is_current")
-    private Boolean current;
+    private Boolean isCurrent;
 
     /**
      * 入住时间

@@ -9,9 +9,14 @@ import cloud.ciky.business.mapper.DmRoomMapper;
 import cloud.ciky.business.model.entity.DmRoom;
 import cloud.ciky.business.model.form.DmRoomForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
+import cloud.ciky.business.model.query.RoomTreeQuery;
+import cloud.ciky.business.model.vo.DmRoomTreeVO;
 import cloud.ciky.business.model.vo.RoomPageVO;
+import cloud.ciky.business.service.BuildingDmService;
 import cloud.ciky.business.service.DmRoomService;
+import cloud.ciky.business.service.RoomStudentService;
 import cloud.ciky.security.util.SecurityUtils;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -24,6 +29,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -38,18 +46,63 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> implements DmRoomService {
 
-    @Override
-    public List<KeyValue> listBuilding() {
-        List<DmRoom> buildingList = this.list(new LambdaQueryWrapper<DmRoom>()
-                .eq(DmRoom::getParentId, SystemConstants.ROOT_NODE_ID)
-                .eq(DmRoom::getDelflag, DelflagEnum.USABLE.getValue())
-                .orderByAsc(DmRoom::getRoomNum));
+    private final BuildingDmService buildingDmService;
+    private final RoomStudentService roomStudentService;
 
-        if (CollectionUtils.isEmpty(buildingList)) {
-            return Collections.emptyList();
+    @Override
+    public List<DmRoomTreeVO> listBuildingRoomTree(RoomTreeQuery query) {
+        Boolean queryAll = query.getQueryAll();
+        String dmId = query.getDmId();
+        String studentId = query.getStudentId();
+
+        List<DmRoom> rooms = this.list(new LambdaQueryWrapper<DmRoom>()
+                .and(queryAll == null || !queryAll,
+                        wrapper -> wrapper.eq(DmRoom::getParentId, SystemConstants.ROOT_NODE_ID))
+                .eq(DmRoom::getDelflag, DelflagEnum.USABLE.getValue())
+                .orderByAsc(DmRoom::getCreateTime));
+
+        String selectedId = null;
+        if (CharSequenceUtil.isNotBlank(studentId)) {
+            selectedId = roomStudentService.getSelectedRoomId(studentId);
+        }
+        if (CharSequenceUtil.isNotBlank(dmId)) {
+            selectedId = buildingDmService.getSelectedBuildingId(dmId);
         }
 
-        return buildingList.stream().map(building -> new KeyValue(building.getId(), building.getRoomNum())).toList();
+        Set<String> parentIds = rooms.stream()
+                .map(DmRoom::getParentId)
+                .collect(Collectors.toSet());
+
+        Set<String> roomIds = rooms.stream()
+                .map(DmRoom::getId)
+                .collect(Collectors.toSet());
+
+        List<String> rootIds = parentIds.stream()
+                .filter(id -> !roomIds.contains(id))
+                .toList();
+
+        String finalSelectedId = selectedId;
+        return rootIds.stream()
+                .flatMap(rootId -> buildRoomTree(rootId, rooms, finalSelectedId).stream())
+                .toList();
+    }
+
+    private List<DmRoomTreeVO> buildRoomTree(String parentId, List<DmRoom> roomList, String selectedId) {
+        return CollUtil.emptyIfNull(roomList)
+                .stream()
+                .filter(room -> room.getParentId().equals(parentId))
+                .map(entity -> {
+                    DmRoomTreeVO vo = new DmRoomTreeVO();
+                    vo.setId(entity.getId());
+                    vo.setParentId(entity.getParentId());
+                    vo.setTreePath(entity.getTreePath());
+                    vo.setRoomNum(entity.getRoomNum());
+                    vo.setCapacity(entity.getCapacity());
+                    vo.setSelected(Objects.equals(entity.getId(), selectedId));
+                    List<DmRoomTreeVO> children = buildRoomTree(entity.getId(), roomList, selectedId);
+                    vo.setChildren(children);
+                    return vo;
+                }).toList();
     }
 
     @Override
