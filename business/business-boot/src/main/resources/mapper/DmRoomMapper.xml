@@ -50,8 +50,12 @@
             room.id,
             room.parent_id,
             room.room_num,
-            room.capacity
+            room.capacity,
+            dm.id as dmId,
+            dm.real_name as dmName
         from dm_room room
+             left join building_dm bd on bd.building_id = room.id and bd.is_current = 1
+             left join user_dormitory_manager dm on dm.id = bd.dm_id and dm.delflag = 0
         where room.id = #{id} and room.delflag = 0
     </select>
 

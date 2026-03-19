@@ -34,4 +34,10 @@ public class DmRoomForm {
     @Schema(description = "可住人数")
     private Integer capacity;
 
+    @Schema(description = "宿管id")
+    private String dmId;
+
+    @Schema(description = "宿管名称")
+    private String dmName;
+
 }

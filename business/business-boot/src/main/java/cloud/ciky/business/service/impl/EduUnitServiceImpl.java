@@ -145,10 +145,10 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         Integer gradeYear = form.getGradeYear();
         String userId = SecurityUtils.getUserId();
 
-        // 新增班级, 年份/班主任判空
+        // 新增班级, 年级判空
         if (eduType.equals(EduUnitTypeEnum.CLASS.getValue())) {
-            if (ObjUtil.isNull(gradeYear) || CharSequenceUtil.isBlank(form.getHeadTeacherId())) {
-                throw new BusinessException("年份/班主任不能为空!");
+            if (ObjUtil.isNull(gradeYear)) {
+                throw new BusinessException("年级不能为空!");
             }
         }
 
@@ -178,7 +178,7 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         entity.setTreePath(treePath);
         boolean saved = this.saveOrUpdate(entity);
 
-        if(saved) {
+        if(saved && CharSequenceUtil.isNotBlank(form.getHeadTeacherId())) {
             // 保存教师-班级关系
             ClassTeacherForm classTeacherForm = new ClassTeacherForm();
             classTeacherForm.setClassId(entity.getId());

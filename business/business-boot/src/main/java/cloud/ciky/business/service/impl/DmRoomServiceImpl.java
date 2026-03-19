@@ -1,12 +1,11 @@
 package cloud.ciky.business.service.impl;
 
-import cloud.ciky.base.BasePageQuery;
 import cloud.ciky.base.constant.SystemConstants;
 import cloud.ciky.base.enums.DelflagEnum;
 import cloud.ciky.base.exception.BusinessException;
-import cloud.ciky.base.model.KeyValue;
 import cloud.ciky.business.mapper.DmRoomMapper;
 import cloud.ciky.business.model.entity.DmRoom;
+import cloud.ciky.business.model.form.BuildingDmForm;
 import cloud.ciky.business.model.form.DmRoomForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
 import cloud.ciky.business.model.query.RoomTreeQuery;
@@ -25,9 +24,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -116,6 +114,7 @@ public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean saveRoom(DmRoomForm form) {
         String id = form.getId();
         String parentId = form.getParentId();
@@ -145,7 +144,17 @@ public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> impleme
         String treePath = generateRoomTreePath(parentId);
         entity.setTreePath(treePath);
 
-        return this.saveOrUpdate(entity);
+        boolean saved = this.saveOrUpdate(entity);
+
+        if(saved && CharSequenceUtil.isNotBlank(form.getDmId())){
+            // 保存宿管负责楼栋
+            BuildingDmForm buildingDmForm = new BuildingDmForm();
+            buildingDmForm.setBuildingId(entity.getId());
+            buildingDmForm.setDmId(form.getDmId());
+            saved = buildingDmService.saveBuildingDm(buildingDmForm);
+        }
+        return saved;
+
     }
 
     private String generateRoomTreePath(String parentId) {

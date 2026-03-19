@@ -1,6 +1,7 @@
 package cloud.ciky.business.service;
 
 import cloud.ciky.business.model.entity.BuildingDm;
+import cloud.ciky.business.model.form.BuildingDmForm;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -25,4 +26,15 @@ public interface BuildingDmService extends IService<BuildingDm> {
      */
     String getSelectedBuildingId(String dmId);
 
+    /**
+     * <p>
+     * 保存宿管负责楼栋
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/19 23:52
+     * @param buildingDmForm 表单对象
+     * @return boolean
+     */
+    boolean saveBuildingDm(BuildingDmForm buildingDmForm);
 }
