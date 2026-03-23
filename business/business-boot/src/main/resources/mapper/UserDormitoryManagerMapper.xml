@@ -26,13 +26,18 @@
             dm.id,
             dm.real_name as realName,
             dm.dm_num as dmNum,
-            dm.entry_date as entryDate
+            dm.entry_date as entryDate,
+            group_concat(ifnull(r.room_num, '') order by r.room_num, r.create_time) as building
         from user_dormitory_manager dm
+            left join building_dm bd on bd.dm_id = dm.id and bd.is_current = 1
+            left join dm_room r on r.id = bd.building_id and r.delflag = 0
+                    and r.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
         where dm.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
             and (dm.real_name like concat('%', #{query.keywords}, '%')
                 or dm.dm_num like concat('%', #{query.keywords}, '%'))
         </if>
+        group by dm.id
         order by dm.create_time desc
     </select>
 

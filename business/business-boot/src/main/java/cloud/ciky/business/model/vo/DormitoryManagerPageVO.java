@@ -28,6 +28,9 @@ public class DormitoryManagerPageVO {
     @Schema(description = "工号")
     private String dmNum;
 
+    @Schema(description = "楼栋名")
+    private String building;
+
     @Schema(description = "入职日期")
     @JsonFormat(pattern = DateFormatConstants.FORMAT8)
     private LocalDate entryDate;

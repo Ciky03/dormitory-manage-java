@@ -53,11 +53,13 @@ public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> impleme
         String dmId = query.getDmId();
         String studentId = query.getStudentId();
 
-        List<DmRoom> rooms = this.list(new LambdaQueryWrapper<DmRoom>()
-                .and(queryAll == null || !queryAll,
-                        wrapper -> wrapper.eq(DmRoom::getParentId, SystemConstants.ROOT_NODE_ID))
-                .eq(DmRoom::getDelflag, DelflagEnum.USABLE.getValue())
-                .orderByAsc(DmRoom::getCreateTime));
+        List<DmRoomTreeVO> roomTrees= this.baseMapper.selectBuildingRoomList(query);
+
+//        List<DmRoom> rooms = this.list(new LambdaQueryWrapper<DmRoom>()
+//                .and(queryAll == null || !queryAll,
+//                        wrapper -> wrapper.eq(DmRoom::getParentId, SystemConstants.ROOT_NODE_ID))
+//                .eq(DmRoom::getDelflag, DelflagEnum.USABLE.getValue())
+//                .orderByAsc(DmRoom::getCreateTime));
 
         String selectedId = null;
         if (CharSequenceUtil.isNotBlank(studentId)) {
@@ -67,12 +69,12 @@ public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> impleme
             selectedId = buildingDmService.getSelectedBuildingId(dmId);
         }
 
-        Set<String> parentIds = rooms.stream()
-                .map(DmRoom::getParentId)
+        Set<String> parentIds = roomTrees.stream()
+                .map(DmRoomTreeVO::getParentId)
                 .collect(Collectors.toSet());
 
-        Set<String> roomIds = rooms.stream()
-                .map(DmRoom::getId)
+        Set<String> roomIds = roomTrees.stream()
+                .map(DmRoomTreeVO::getId)
                 .collect(Collectors.toSet());
 
         List<String> rootIds = parentIds.stream()
@@ -81,25 +83,25 @@ public class DmRoomServiceImpl extends ServiceImpl<DmRoomMapper, DmRoom> impleme
 
         String finalSelectedId = selectedId;
         return rootIds.stream()
-                .flatMap(rootId -> buildRoomTree(rootId, rooms, finalSelectedId).stream())
+                .flatMap(rootId -> buildRoomTree(rootId, roomTrees, finalSelectedId).stream())
                 .toList();
     }
 
-    private List<DmRoomTreeVO> buildRoomTree(String parentId, List<DmRoom> roomList, String selectedId) {
+    private List<DmRoomTreeVO> buildRoomTree(String parentId, List<DmRoomTreeVO> roomList, String selectedId) {
         return CollUtil.emptyIfNull(roomList)
                 .stream()
                 .filter(room -> room.getParentId().equals(parentId))
                 .map(entity -> {
-                    DmRoomTreeVO vo = new DmRoomTreeVO();
-                    vo.setId(entity.getId());
-                    vo.setParentId(entity.getParentId());
-                    vo.setTreePath(entity.getTreePath());
-                    vo.setRoomNum(entity.getRoomNum());
-                    vo.setCapacity(entity.getCapacity());
-                    vo.setSelected(Objects.equals(entity.getId(), selectedId));
+//                    DmRoomTreeVO vo = new DmRoomTreeVO();
+//                    vo.setId(entity.getId());
+//                    vo.setParentId(entity.getParentId());
+//                    vo.setTreePath(entity.getTreePath());
+//                    vo.setRoomNum(entity.getRoomNum());
+//                    vo.setCapacity(entity.getCapacity());
+                    entity.setSelected(Objects.equals(entity.getId(), selectedId));
                     List<DmRoomTreeVO> children = buildRoomTree(entity.getId(), roomList, selectedId);
-                    vo.setChildren(children);
-                    return vo;
+                    entity.setChildren(children);
+                    return entity;
                 }).toList();
     }
 

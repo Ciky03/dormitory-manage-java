@@ -35,6 +35,12 @@ public class DmRoomTreeVO {
     @Schema(description = "是否已选择(1-已选择 2-未选择)")
     private Boolean selected;
 
+    @Schema(description = "宿管id")
+    private String dmId;
+
+    @Schema(description = "宿管")
+    private String dmName;
+
     @Schema(description = "子节点")
     private List<DmRoomTreeVO> children;
 }
