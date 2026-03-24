@@ -16,6 +16,16 @@ public interface JwtClaimConstants {
     String USER_ID = "userId";
 
     /**
+     * 业务用户id(学生id/教师id/宿管id)
+     */
+    String BUSINESS_USER_ID = "businessUserId";
+
+    /**
+     * 用户类型(0-其他 1-学生 2-教师 3-宿管)
+     */
+    String USER_TYPE = "userType";
+
+    /**
      * 用户名
      */
     String USERNAME = "username";

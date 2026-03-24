@@ -28,6 +28,8 @@
     <!-- 用户认证信息映射 -->
     <resultMap id="UserAuthMap" type="cloud.ciky.system.model.dto.UserAuthDTO">
         <id property="userId" column="id"/>
+        <result property="businessUserId" column="business_user_id"/>
+        <result property="userType" column="user_type"/>
         <result property="username" column="username"/>
         <result property="realName" column="real_name"/>
         <result property="password" column="password"/>
@@ -46,6 +48,8 @@
     <select id="getUserAuthInfo" resultMap="UserAuthMap"
             parameterType="java.lang.String">
         select su.id,
+               su.business_user_id,
+               su.user_type,
                su.username,
                su.real_name,
                su.password,

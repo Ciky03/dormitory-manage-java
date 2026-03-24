@@ -1,5 +1,6 @@
 package cloud.ciky.security.util;
 
+import cloud.ciky.base.constant.JwtClaimConstants;
 import cloud.ciky.base.constant.SystemConstants;
 import cn.hutool.core.convert.Convert;
 import org.springframework.security.core.Authentication;
@@ -28,7 +29,23 @@ public class SecurityUtils {
     public static String getUserId() {
         Map<String, Object> tokenAttributes = getTokenAttributes();
         if (tokenAttributes != null) {
-            return Convert.toStr(tokenAttributes.get("userId"));
+            return Convert.toStr(tokenAttributes.get(JwtClaimConstants.USER_ID));
+        }
+        return null;
+    }
+
+    public static String getBusinessUserId() {
+        Map<String, Object> tokenAttributes = getTokenAttributes();
+        if (tokenAttributes != null) {
+            return Convert.toStr(tokenAttributes.get(JwtClaimConstants.BUSINESS_USER_ID));
+        }
+        return null;
+    }
+
+    public static Integer getUserType() {
+        Map<String, Object> tokenAttributes = getTokenAttributes();
+        if (tokenAttributes != null) {
+            return Convert.toInt(tokenAttributes.get(JwtClaimConstants.USER_TYPE));
         }
         return null;
     }
@@ -44,19 +61,10 @@ public class SecurityUtils {
     public static String getRealName() {
         Map<String, Object> tokenAttributes = getTokenAttributes();
         if (tokenAttributes != null) {
-            return Convert.toStr(tokenAttributes.get("realname"));
+            return Convert.toStr(tokenAttributes.get(JwtClaimConstants.REAL_NAME));
         }
         return null;
     }
-
-    public static String getTenantId() {
-        Map<String, Object> tokenAttributes = getTokenAttributes();
-        if (tokenAttributes != null) {
-            return Convert.toStr(tokenAttributes.get("tenant_id"));
-        }
-        return null;
-    }
-
 
     public static Map<String, Object> getTokenAttributes() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -88,25 +96,9 @@ public class SecurityUtils {
         return null;
     }
 
-    /**
-     * 获取部门ID
-     */
-    public static String getDeptId() {
-        Map<String, Object> tokenAttributes = getTokenAttributes();
-        if (tokenAttributes != null) {
-            return Convert.toStr(tokenAttributes.get("deptId"));
-        }
-        return null;
-    }
-
     public static boolean isAdmin() {
         Set<String> roles = getRoles();
         return roles != null && roles.contains(SystemConstants.ADMIN_ROLE_CODE);
-    }
-
-    public static boolean isDocAdmin(){
-        Set<String> roles = getRoles();
-        return roles != null && roles.contains(SystemConstants.DOC_ADMIN_ROLE_CODE);
     }
 
     public static String getJti() {
@@ -134,7 +126,7 @@ public class SecurityUtils {
     public static Integer getDataScope() {
         Map<String, Object> tokenAttributes = getTokenAttributes();
         if (tokenAttributes != null) {
-            return Convert.toInt(tokenAttributes.get("dataScope"));
+            return Convert.toInt(tokenAttributes.get(JwtClaimConstants.DATA_SCOPE));
         }
         return null;
     }

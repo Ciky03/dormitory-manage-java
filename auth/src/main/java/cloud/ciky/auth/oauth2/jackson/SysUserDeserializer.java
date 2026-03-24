@@ -1,6 +1,7 @@
 package cloud.ciky.auth.oauth2.jackson;
 
 import cloud.ciky.auth.model.SysUserDetails;
+import cloud.ciky.base.constant.JwtClaimConstants;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -40,17 +41,19 @@ public class SysUserDeserializer extends JsonDeserializer<SysUserDetails> {
         Set<? extends GrantedAuthority> authorities = mapper.convertValue(jsonNode.get("authorities"),
                 SIMPLE_GRANTED_AUTHORITY_SET);
         JsonNode passwordNode = readJsonNode(jsonNode, "password");
-        String userId = readJsonNode(jsonNode, "userId").asText();
-        String username = readJsonNode(jsonNode, "username").asText();
-        String realname = readJsonNode(jsonNode, "realname").asText();
         String password = passwordNode.asText("");
-        Integer dataScope = readJsonNode(jsonNode, "dataScope").asInt();
+        String userId = readJsonNode(jsonNode, JwtClaimConstants.USER_ID).asText();
+        String businessUserId = readJsonNode(jsonNode, JwtClaimConstants.BUSINESS_USER_ID).asText();
+        Integer userType = readJsonNode(jsonNode, JwtClaimConstants.USER_TYPE).asInt();
+        String username = readJsonNode(jsonNode, JwtClaimConstants.USERNAME).asText();
+        String realname = readJsonNode(jsonNode, JwtClaimConstants.REAL_NAME).asText();
+        Integer dataScope = readJsonNode(jsonNode, JwtClaimConstants.DATA_SCOPE).asInt();
         boolean enabled = readJsonNode(jsonNode, "enabled").asBoolean();
         boolean accountNonExpired = readJsonNode(jsonNode, "accountNonExpired").asBoolean();
         boolean credentialsNonExpired = readJsonNode(jsonNode, "credentialsNonExpired").asBoolean();
         boolean accountNonLocked = readJsonNode(jsonNode, "accountNonLocked").asBoolean();
-        SysUserDetails result = new SysUserDetails(userId, username,realname, password, dataScope, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked,
-                authorities);
+        SysUserDetails result = new SysUserDetails(userId, businessUserId, userType, username, realname, password,
+                dataScope, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         if (passwordNode.asText(null) == null) {
             result.eraseCredentials();
         }

@@ -21,6 +21,16 @@ public class UserAuthDTO {
     private String userId;
 
     /**
+     * 业务用户id(学生id/教师id/宿管id)
+     */
+    private String businessUserId;
+
+    /**
+     * 用户类型(0-其他 1-学生 2-教师 3-宿管)
+     */
+    private Integer userType;
+
+    /**
      * 用户名
      */
     private String username;

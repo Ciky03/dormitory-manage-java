@@ -1,4 +1,4 @@
-package cloud.ciky.system.enums;
+package cloud.ciky.base.enums;
 
 import cloud.ciky.base.IBaseEnum;
 import lombok.Getter;
@@ -15,7 +15,8 @@ public enum UserTypeEnum implements IBaseEnum<Integer> {
     OTHER(0, "其他", "OTHER"),
     STUDENT(1, "学生", "STUDENT"),
     TEACHER(2, "教师", "TEACHER"),
-    DORMITORY_MANAGER(3, "宿管", "DORMITORY_MANAGER");
+    DORMITORY_MANAGER(3, "宿管", "DORMITORY_MANAGER"),
+    ADMIN(99, "系统管理员", "ADMIN");
 
     @Getter
     private Integer value;

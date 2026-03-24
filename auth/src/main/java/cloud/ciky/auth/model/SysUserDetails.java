@@ -34,6 +34,17 @@ public class SysUserDetails implements UserDetails, CredentialsContainer {
     private String userId;
 
     /**
+     * 业务用户id(学生id/教师id/宿管id)
+     */
+    private String businessUserId;
+
+    /**
+     * 用户类型(0-其他 1-学生 2-教师 3-宿管)
+     */
+    private Integer userType;
+
+
+    /**
      * 用户角色数据权限集合
      */
     private Integer dataScope;
@@ -60,6 +71,8 @@ public class SysUserDetails implements UserDetails, CredentialsContainer {
      */
     public SysUserDetails(UserAuthDTO user) {
         this.setUserId(user.getUserId());
+        this.setBusinessUserId(user.getBusinessUserId());
+        this.setUserType(user.getUserType());
         this.setUsername(user.getUsername());
         this.setRealname(user.getRealName());
         this.setDataScope(user.getDataScope());
@@ -75,6 +88,8 @@ public class SysUserDetails implements UserDetails, CredentialsContainer {
 
     public SysUserDetails(
             String userId,
+            String businessUserId,
+            Integer userType,
             String username,
             String realname,
             String password,
@@ -86,6 +101,8 @@ public class SysUserDetails implements UserDetails, CredentialsContainer {
             Set<? extends GrantedAuthority> authorities
     ) {
         this.userId = userId;
+        this.businessUserId = businessUserId;
+        this.userType = userType;
         this.username = username;
         this.realname = realname;
         this.password = password;
@@ -138,19 +155,4 @@ public class SysUserDetails implements UserDetails, CredentialsContainer {
         this.password = null;
     }
 
-
-    public static void main(String[] args) {
-        String password = "111111";
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        for (int i = 0; i < 5; i++) {
-            //生成密码
-            String encode = passwordEncoder.encode(password);
-            System.out.println(encode);
-            //校验密码,参数1是输入的明文 ，参数2是正确密码加密后的串
-            boolean matches = passwordEncoder.matches(password, encode);
-            System.out.println(matches);
-        }
-        boolean matches = passwordEncoder.matches("1234", "$2a$10$fb2RlvFwr9HsRu9vH1OxCu/YiMRw6wy5UI6u3s0A.0bVSuR1UqdHK");
-        System.out.println(matches);
-    }
 }

@@ -49,6 +49,8 @@ public class JwtTokenCustomizerConfig {
                     if (principal instanceof SysUserDetails userDetails) { // 系统用户添加自定义字段
 
                         claims.claim(JwtClaimConstants.USER_ID, userDetails.getUserId());
+                        claims.claim(JwtClaimConstants.BUSINESS_USER_ID, userDetails.getBusinessUserId());
+                        claims.claim(JwtClaimConstants.USER_TYPE, userDetails.getUserType());
                         claims.claim(JwtClaimConstants.USERNAME, userDetails.getUsername());
                         claims.claim(JwtClaimConstants.REAL_NAME, userDetails.getRealname());
                         claims.claim(JwtClaimConstants.DATA_SCOPE, Objects.isNull(userDetails.getDataScope())?1:userDetails.getDataScope());

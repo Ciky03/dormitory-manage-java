@@ -10,7 +10,7 @@ import cloud.ciky.business.model.vo.TeacherPageVO;
 import cloud.ciky.business.service.UserTeacherService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
-import cloud.ciky.system.enums.UserTypeEnum;
+import cloud.ciky.base.enums.UserTypeEnum;
 import cloud.ciky.system.model.form.UserForm;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

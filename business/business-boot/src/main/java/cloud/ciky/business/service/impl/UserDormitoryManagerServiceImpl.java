@@ -10,7 +10,7 @@ import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
 import cloud.ciky.business.service.UserDormitoryManagerService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
-import cloud.ciky.system.enums.UserTypeEnum;
+import cloud.ciky.base.enums.UserTypeEnum;
 import cloud.ciky.system.model.form.UserForm;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -20,9 +20,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
