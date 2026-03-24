@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @Schema(description = "楼栋/宿舍树视图对象")
-public class DmRoomTreeVO {
+public class DormitoryTreeVO {
 
     @Schema(description = "id")
     private String id;
@@ -42,5 +42,5 @@ public class DmRoomTreeVO {
     private String dmName;
 
     @Schema(description = "子节点")
-    private List<DmRoomTreeVO> children;
+    private List<DormitoryTreeVO> children;
 }

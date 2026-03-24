@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cloud.ciky.business.mapper.DmRoomMapper">
+<mapper namespace="cloud.ciky.business.mapper.DormitoryMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmRoom">
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.Dormitory">
         <id column="id" property="id" />
         <result column="parent_id" property="parentId" />
         <result column="tree_path" property="treePath" />
@@ -29,8 +29,8 @@
             room.capacity,
             building.room_num as buildingNum,
             room.create_time
-        from dm_room room
-        left join dm_room building on building.id = room.parent_id and building.delflag = 0
+        from dormitory room
+        left join dormitory building on building.id = room.parent_id and building.delflag = 0
                     and building.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
         where room.delflag = 0
         and room.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
@@ -45,7 +45,7 @@
     </select>
 
     <!--获取楼栋/宿舍表单-->
-    <select id="selectRoomForm" resultType="cloud.ciky.business.model.form.DmRoomForm">
+    <select id="selectRoomForm" resultType="cloud.ciky.business.model.form.DormitoryForm">
         select
             room.id,
             room.parent_id,
@@ -53,12 +53,12 @@
             room.capacity,
             dm.id as dmId,
             dm.real_name as dmName
-        from dm_room room
+        from dormitory room
              left join building_dm bd on bd.building_id = room.id and bd.is_current = 1
-             left join user_dormitory_manager dm on dm.id = bd.dm_id and dm.delflag = 0
+             left join user_dm dm on dm.id = bd.dm_id and dm.delflag = 0
         where room.id = #{id} and room.delflag = 0
     </select>
-    <select id="selectBuildingRoomList" resultType="cloud.ciky.business.model.vo.DmRoomTreeVO"
+    <select id="selectBuildingRoomList" resultType="cloud.ciky.business.model.vo.DormitoryTreeVO"
             parameterType="cloud.ciky.business.model.query.RoomTreeQuery">
         select r.id,
                r.parent_id,
@@ -67,9 +67,9 @@
                r.capacity,
                dm.id as dmId,
                dm.real_name as dmName
-        from dm_room r
+        from dormitory r
                  left join building_dm bd on bd.building_id = r.id and bd.is_current = 1
-                 left join user_dormitory_manager dm on dm.id = bd.dm_id and dm.delflag = 0
+                 left join user_dm dm on dm.id = bd.dm_id and dm.delflag = 0
         where r.delflag = 0
         <if test="queryAll == null or !queryAll">
             and r.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'

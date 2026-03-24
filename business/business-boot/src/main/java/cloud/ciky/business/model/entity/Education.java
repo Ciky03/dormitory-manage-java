@@ -8,16 +8,16 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 宿舍表
+ * 学院/专业/班级表
  * </p>
  *
  * @author ciky
- * @since 2026-03-11 17:04:20
+ * @since 2026-02-05 17:03:26
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("dm_room")
-public class DmRoom extends BaseEntity {
+@TableName("education")
+public class Education extends BaseEntity {
 
     /**
      * 父id
@@ -32,15 +32,21 @@ public class DmRoom extends BaseEntity {
     private String treePath;
 
     /**
-     * 楼栋/宿舍号
+     * 类型(1-学院 2-专业 3-班级)
      */
-    @TableField("room_num")
-    private String roomNum;
+    @TableField("type")
+    private Integer type;
 
     /**
-     * 宿舍人数
+     * 名称
      */
-    @TableField("capacity")
-    private Integer capacity;
+    @TableField("name")
+    private String name;
+
+    /**
+     * 年级(仅班级可用)
+     */
+    @TableField("grade_year")
+    private Integer gradeYear;
 
 }

@@ -4,16 +4,12 @@ import cloud.ciky.base.BaseQuery;
 import cloud.ciky.base.enums.LogModuleEnum;
 import cloud.ciky.base.result.PageResult;
 import cloud.ciky.base.result.Result;
-import cloud.ciky.business.model.form.UserDormitoryManagerForm;
-import cloud.ciky.business.model.form.UserStudentForm;
-import cloud.ciky.business.model.form.UserTeacherForm;
+import cloud.ciky.business.model.form.*;
 import cloud.ciky.business.model.query.StudentPageQuery;
-import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
+import cloud.ciky.business.model.vo.DmPageVO;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import cloud.ciky.business.model.vo.TeacherPageVO;
-import cloud.ciky.business.service.UserDormitoryManagerService;
-import cloud.ciky.business.service.UserStudentService;
-import cloud.ciky.business.service.UserTeacherService;
+import cloud.ciky.business.service.*;
 import cloud.ciky.core.annotation.Log;
 import cloud.ciky.core.annotation.RepeatSubmit;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,8 +36,9 @@ public class BusinessUserController {
 
     private final UserStudentService studentService;
     private final UserTeacherService teacherService;
-    private final UserDormitoryManagerService dormitoryManagerService;
-
+    private final UserDmService dmService;
+    private final ClassStudentService classStudentService;
+    private final RoomStudentService roomStudentService;
     @Operation(summary = "获取学生分页列表")
     @GetMapping("/student/list")
     public PageResult<StudentPageVO> listStudent(@ParameterObject StudentPageQuery query) {
@@ -58,8 +55,8 @@ public class BusinessUserController {
 
     @Operation(summary = "获取宿管分页列表")
     @GetMapping("/dm/list")
-    public PageResult<DormitoryManagerPageVO> listDormitoryManager(@ParameterObject BaseQuery query) {
-        Page<DormitoryManagerPageVO> page = dormitoryManagerService.listDormitoryManager(query);
+    public PageResult<DmPageVO> listDormitoryManager(@ParameterObject BaseQuery query) {
+        Page<DmPageVO> page = dmService.listDormitoryManager(query);
         return PageResult.success(page);
     }
 
@@ -79,8 +76,8 @@ public class BusinessUserController {
 
     @Operation(summary = "获取宿管表单")
     @GetMapping("/dm/form/{id}")
-    public Result<UserDormitoryManagerForm> getDormitoryManagerForm(@PathVariable String id) {
-        UserDormitoryManagerForm form = dormitoryManagerService.getDormitoryManagerForm(id);
+    public Result<UserDmForm> getDormitoryManagerForm(@PathVariable String id) {
+        UserDmForm form = dmService.getDormitoryManagerForm(id);
         return Result.success(form);
     }
 
@@ -106,8 +103,8 @@ public class BusinessUserController {
     @Log(value = "新增宿管", module = LogModuleEnum.DORMITORY_MANAGER)
     @RepeatSubmit
     @PostMapping("/dm/add")
-    public Result<Void> addDormitoryManager(@Validated @RequestBody UserDormitoryManagerForm form) {
-        boolean result = dormitoryManagerService.saveDormitoryManager(form);
+    public Result<Void> addDormitoryManager(@Validated @RequestBody UserDmForm form) {
+        boolean result = dmService.saveDormitoryManager(form);
         return Result.judge(result);
     }
 
@@ -137,10 +134,10 @@ public class BusinessUserController {
     @Log(value = "修改宿管", module = LogModuleEnum.DORMITORY_MANAGER)
     @RepeatSubmit
     @PutMapping("/dm/edit/{id}")
-    public Result<Void> editDormitoryManager(@Validated @RequestBody UserDormitoryManagerForm form,
+    public Result<Void> editDormitoryManager(@Validated @RequestBody UserDmForm form,
                                              @PathVariable String id) {
         form.setId(id);
-        boolean result = dormitoryManagerService.saveDormitoryManager(form);
+        boolean result = dmService.saveDormitoryManager(form);
         return Result.judge(result);
     }
 
@@ -164,7 +161,25 @@ public class BusinessUserController {
     @Log(value = "删除宿管", module = LogModuleEnum.DORMITORY_MANAGER)
     @DeleteMapping("/dm/del/{id}")
     public Result<Void> deleteDormitoryManager(@PathVariable String id) {
-        boolean result = dormitoryManagerService.deleteDormitoryManager(id);
+        boolean result = dmService.deleteDormitoryManager(id);
+        return Result.judge(result);
+    }
+
+    @Operation(summary = "保存班级学生信息")
+    @Log(value = "保存班级学生信息", module = LogModuleEnum.STUDENT)
+    @RepeatSubmit
+    @PostMapping("/class/student/add")
+    public Result<Void> saveClassStudent(@Validated @RequestBody ClassStudentForm form) {
+        boolean result = classStudentService.saveClassStudent(form);
+        return Result.judge(result);
+    }
+
+    @Operation(summary = "保存学生宿舍信息")
+    @Log(value = "保存学生宿舍信息", module = LogModuleEnum.STUDENT)
+    @RepeatSubmit
+    @PostMapping("/room/student/add")
+    public Result<Void> saveRoomStudent(@Validated @RequestBody RoomStudentForm form) {
+        boolean result = roomStudentService.saveRoomStudent(form);
         return Result.judge(result);
     }
 

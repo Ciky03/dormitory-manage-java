@@ -18,7 +18,7 @@ import java.time.LocalDate;
  */
 @Data
 @Schema(description = "宿管表单对象")
-public class UserDormitoryManagerForm {
+public class UserDmForm {
 
     @Schema(description = "宿管id")
     private String id;

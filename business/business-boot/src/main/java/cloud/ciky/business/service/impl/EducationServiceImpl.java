@@ -4,20 +4,18 @@ import cloud.ciky.base.IBaseEnum;
 import cloud.ciky.base.constant.SystemConstants;
 import cloud.ciky.base.enums.DelflagEnum;
 import cloud.ciky.base.exception.BusinessException;
-import cloud.ciky.business.enums.EduUnitTypeEnum;
-import cloud.ciky.business.model.entity.ClassStudent;
-import cloud.ciky.business.model.entity.ClassTeacher;
-import cloud.ciky.business.model.entity.EduUnit;
-import cloud.ciky.business.mapper.EduUnitMapper;
+import cloud.ciky.business.enums.EducationTypeEnum;
+import cloud.ciky.business.model.entity.Education;
+import cloud.ciky.business.mapper.EducationMapper;
 import cloud.ciky.business.model.form.ClassTeacherForm;
-import cloud.ciky.business.model.form.EduUnitForm;
+import cloud.ciky.business.model.form.EducationForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
-import cloud.ciky.business.model.query.UnitQuery;
+import cloud.ciky.business.model.query.EducationQuery;
 import cloud.ciky.business.model.vo.ClassPageVO;
-import cloud.ciky.business.model.vo.EduUnitVO;
+import cloud.ciky.business.model.vo.EducationVO;
 import cloud.ciky.business.service.ClassStudentService;
 import cloud.ciky.business.service.ClassTeacherService;
-import cloud.ciky.business.service.EduUnitService;
+import cloud.ciky.business.service.EducationService;
 import cloud.ciky.security.util.SecurityUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -26,16 +24,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ibm.icu.text.UFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,24 +45,24 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> implements EduUnitService {
+public class EducationServiceImpl extends ServiceImpl<EducationMapper, Education> implements EducationService {
 
     private final ClassStudentService classStudentService;
     private final ClassTeacherService classTeacherService;
 
     @Override
-    public List<EduUnitVO> listUnitTree(UnitQuery query) {
+    public List<EducationVO> listEducationTree(EducationQuery query) {
         Boolean queryAll = query.getQueryAll();
         String studentId = query.getStudentId();
         String teacherId = query.getTeacherId();
 
-        List<EduUnit> units = this.list(new LambdaQueryWrapper<EduUnit>()
+        List<Education> educations = this.list(new LambdaQueryWrapper<Education>()
                 .and(queryAll == null || !queryAll,
-                        wrapper -> wrapper.eq(EduUnit::getType, EduUnitTypeEnum.COLLEGE.getValue())
+                        wrapper -> wrapper.eq(Education::getType, EducationTypeEnum.COLLEGE.getValue())
                                 .or()
-                                .eq(EduUnit::getType, EduUnitTypeEnum.MAJOR.getValue()))
-                .eq(EduUnit::getDelflag, DelflagEnum.USABLE.getValue())
-                .orderByAsc(EduUnit::getGradeYear, EduUnit::getName, EduUnit::getCreateTime));
+                                .eq(Education::getType, EducationTypeEnum.MAJOR.getValue()))
+                .eq(Education::getDelflag, DelflagEnum.USABLE.getValue())
+                .orderByAsc(Education::getGradeYear, Education::getName, Education::getCreateTime));
 
         // 查询已经被选择的班级
         String selectedClassId = null;
@@ -79,22 +74,22 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         }
 
 
-        Set<String> parentIds = units.stream()
-                .map(EduUnit::getParentId)
+        Set<String> parentIds = educations.stream()
+                .map(Education::getParentId)
                 .collect(Collectors.toSet());
 
-        Set<String> unitIds = units.stream()
-                .map(EduUnit::getId)
+        Set<String> educationIds = educations.stream()
+                .map(Education::getId)
                 .collect(Collectors.toSet());
 
         // 获取根节点id
         List<String> rootIds = parentIds.stream()
-                .filter(id -> !unitIds.contains(id))
+                .filter(id -> !educationIds.contains(id))
                 .toList();
 
         String finalSelectedClassId = selectedClassId;
         return rootIds.stream()
-                .flatMap(rootId -> buildUnitTree(rootId, units, finalSelectedClassId).stream())
+                .flatMap(rootId -> buildEducationTree(rootId, educations, finalSelectedClassId).stream())
                 .toList();
     }
 
@@ -104,27 +99,27 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
      * </p>
      *
      * @param parentId 父id
-     * @param unitList 学院/专业列表
+     * @param educationList 学院/专业列表
      * @param selectedClassId 选中的班级id
      * @author ciky
      * @since 2026/2/5 17:33
      */
-    private List<EduUnitVO> buildUnitTree(String parentId, List<EduUnit> unitList, String selectedClassId) {
-        return CollUtil.emptyIfNull(unitList)
+    private List<EducationVO> buildEducationTree(String parentId, List<Education> educationList, String selectedClassId) {
+        return CollUtil.emptyIfNull(educationList)
                 .stream()
-                .filter(unit -> unit.getParentId().equals(parentId))
+                .filter(education -> education.getParentId().equals(parentId))
                 .map(entity -> {
                     Integer type = entity.getType();
                     String name = entity.getName();
 
-                    EduUnitVO vo = new EduUnitVO();
+                    EducationVO vo = new EducationVO();
                     vo.setId(entity.getId());
                     vo.setParentId(entity.getParentId());
                     vo.setTreePath(entity.getTreePath());
-                    vo.setName(type.equals(EduUnitTypeEnum.CLASS.getValue()) ? entity.getGradeYear() + name : name);
+                    vo.setName(type.equals(EducationTypeEnum.CLASS.getValue()) ? entity.getGradeYear() + name : name);
                     vo.setType(type);
                     vo.setSelected(Objects.equals(entity.getId(), selectedClassId));
-                    List<EduUnitVO> children = buildUnitTree(entity.getId(), unitList, selectedClassId);
+                    List<EducationVO> children = buildEducationTree(entity.getId(), educationList, selectedClassId);
                     vo.setChildren(children);
                     return vo;
                 }).toList();
@@ -137,7 +132,7 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean saveUnit(EduUnitForm form) {
+    public boolean saveEducation(EducationForm form) {
         String id = form.getId();
         String parentId = form.getParentId();
         String name = form.getName();
@@ -146,24 +141,24 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         String userId = SecurityUtils.getUserId();
 
         // 新增班级, 年级判空
-        if (eduType.equals(EduUnitTypeEnum.CLASS.getValue())) {
+        if (eduType.equals(EducationTypeEnum.CLASS.getValue())) {
             if (ObjUtil.isNull(gradeYear)) {
                 throw new BusinessException("年级不能为空!");
             }
         }
 
-        long count = this.count(new LambdaQueryWrapper<EduUnit>()
-                .ne(CharSequenceUtil.isNotBlank(id), EduUnit::getId, id)
-                .and(wrapper -> wrapper.eq(EduUnit::getParentId, parentId)
-                        .eq(eduType.equals(EduUnitTypeEnum.CLASS.getValue()), EduUnit::getGradeYear, gradeYear)
-                        .eq(EduUnit::getName, name)
-                        .eq(EduUnit::getDelflag, DelflagEnum.USABLE.getValue())));
+        long count = this.count(new LambdaQueryWrapper<Education>()
+                .ne(CharSequenceUtil.isNotBlank(id), Education::getId, id)
+                .and(wrapper -> wrapper.eq(Education::getParentId, parentId)
+                        .eq(eduType.equals(EducationTypeEnum.CLASS.getValue()), Education::getGradeYear, gradeYear)
+                        .eq(Education::getName, name)
+                        .eq(Education::getDelflag, DelflagEnum.USABLE.getValue())));
 
         if (count > 0) {
-            throw new BusinessException(IBaseEnum.getLabelByValue(eduType, EduUnitTypeEnum.class) + "名称已存在, 请修改后重试!");
+            throw new BusinessException(IBaseEnum.getLabelByValue(eduType, EducationTypeEnum.class) + "名称已存在, 请修改后重试!");
         }
 
-        EduUnit entity = new EduUnit();
+        Education entity = new Education();
         if (CharSequenceUtil.isBlank(id)) {
             entity.setCreateBy(userId);
         } else {
@@ -174,7 +169,7 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
         entity.setType(eduType);
         entity.setName(name);
         entity.setGradeYear(gradeYear);
-        String treePath = generateUnitTreePath(parentId);
+        String treePath = generateEducationTreePath(parentId);
         entity.setTreePath(treePath);
         boolean saved = this.saveOrUpdate(entity);
 
@@ -195,44 +190,44 @@ public class EduUnitServiceImpl extends ServiceImpl<EduUnitMapper, EduUnit> impl
      * @param parentId 父ID
      * @return 父节点路径以英文逗号(, )分割，eg: 1,2,3
      */
-    private String generateUnitTreePath(String parentId) {
+    private String generateEducationTreePath(String parentId) {
         if (SystemConstants.ROOT_NODE_ID.equals(parentId)) {
             return parentId;
         } else {
-            EduUnit parent = this.getById(parentId);
+            Education parent = this.getById(parentId);
             return parent != null ? parent.getTreePath() + "," + parent.getId() : null;
         }
     }
 
 
     @Override
-    public EduUnitForm getUnitForm(String id) {
-        return this.baseMapper.selectUnitForm(id);
+    public EducationForm getEducationForm(String id) {
+        return this.baseMapper.selectEducationForm(id);
     }
 
     @Override
-    public boolean deleteUnit(String id) {
-        EduUnit entity = this.getById(id);
+    public boolean deleteEducation(String id) {
+        Education entity = this.getById(id);
         if (entity == null) {
             return true;
         }
 
         // 学院/专业 判断级联
         Integer type = entity.getType();
-        if (type.equals(EduUnitTypeEnum.COLLEGE.getValue()) || type.equals(EduUnitTypeEnum.MAJOR.getValue())) {
-            long sonCount = this.count(new LambdaQueryWrapper<EduUnit>()
-                    .eq(EduUnit::getParentId, id)
-                    .eq(EduUnit::getDelflag, DelflagEnum.USABLE.getValue()));
+        if (type.equals(EducationTypeEnum.COLLEGE.getValue()) || type.equals(EducationTypeEnum.MAJOR.getValue())) {
+            long sonCount = this.count(new LambdaQueryWrapper<Education>()
+                    .eq(Education::getParentId, id)
+                    .eq(Education::getDelflag, DelflagEnum.USABLE.getValue()));
             if (sonCount > 0) {
-                throw new BusinessException(type.equals(EduUnitTypeEnum.COLLEGE.getValue()) ? "该学院存在专业,无法删除!" : "该专业存在班级,无法删除!");
+                throw new BusinessException(type.equals(EducationTypeEnum.COLLEGE.getValue()) ? "该学院存在专业,无法删除!" : "该专业存在班级,无法删除!");
             }
         }
 
         // TODO 判断班级-学生绑定关系
         String userId = SecurityUtils.getUserId();
-        return this.update(new LambdaUpdateWrapper<EduUnit>().set(EduUnit::getDelflag, DelflagEnum.REMOVED.getValue())
-                .set(EduUnit::getUpdateBy, userId)
-                .eq(EduUnit::getId, id));
+        return this.update(new LambdaUpdateWrapper<Education>().set(Education::getDelflag, DelflagEnum.REMOVED.getValue())
+                .set(Education::getUpdateBy, userId)
+                .eq(Education::getId, id));
     }
 
 }

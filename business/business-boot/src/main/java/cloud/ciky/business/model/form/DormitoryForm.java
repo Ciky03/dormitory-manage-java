@@ -2,7 +2,6 @@ package cloud.ciky.business.model.form;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -15,7 +14,7 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "楼栋/宿舍表单对象")
-public class DmRoomForm {
+public class DormitoryForm {
 
     @Schema(description = "id")
     private String id;

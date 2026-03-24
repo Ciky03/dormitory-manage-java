@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @Schema(description = "学院/专业/班级视图对象")
-public class EduUnitVO {
+public class EducationVO {
 
     @Schema(description = "ID")
     private String id;
@@ -39,5 +39,5 @@ public class EduUnitVO {
     private Boolean selected;
 
     @Schema(description = "子菜单")
-    private List<EduUnitVO> children;
+    private List<EducationVO> children;
 }

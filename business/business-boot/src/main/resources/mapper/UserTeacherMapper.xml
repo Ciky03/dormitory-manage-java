@@ -31,8 +31,8 @@
                          order by c.grade_year, c.name) as teachingClass
         from user_teacher t
             left join class_teacher ct on ct.teacher_id = t.id and ct.is_current = 1
-            left join edu_unit c on c.id = ct.class_id and c.delflag = 0
-                and c.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
+            left join education c on c.id = ct.class_id and c.delflag = 0
+                and c.type = ${@cloud.ciky.business.enums.EducationTypeEnum@CLASS.getValue()}
         where t.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
             and (t.real_name like concat('%', #{query.keywords}, '%')
@@ -76,7 +76,7 @@
                u.email
         from dm_business.user_teacher t
                  left join dm_system.sys_user u on u.business_user_id = t.id and u.delflag = 0
-            and u.user_type = ${@cloud.ciky.system.enums.UserTypeEnum@TEACHER.getValue()}
+            and u.user_type = ${@cloud.ciky.base.enums.UserTypeEnum@TEACHER.getValue()}
         where t.id = #{id}
           and t.delflag = 0
     </select>

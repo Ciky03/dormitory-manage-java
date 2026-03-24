@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cloud.ciky.business.mapper.EduUnitMapper">
+<mapper namespace="cloud.ciky.business.mapper.EducationMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.EduUnit">
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.Education">
         <id column="id" property="id" />
         <result column="parent_id" property="parentId" />
         <result column="tree_path" property="treePath" />
@@ -33,14 +33,14 @@
                major.name   as majorName,
                t.real_name as headTeacher,
                class.create_time
-        from edu_unit class
-                 left join edu_unit college
+        from education class
+                 left join education college
                            on find_in_set(college.id, class.tree_path) and college.type = 1 and college.delflag = 0
-                 left join edu_unit major
+                 left join education major
                            on major.id = class.parent_id and major.type = 2 and major.delflag = 0
                 left join class_teacher ct on ct.class_id = class.id and ct.is_current = 1
                 left join user_teacher t on t.id = ct.teacher_id and t.delflag = 0
-        where class.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
+        where class.type = ${@cloud.ciky.business.enums.EducationTypeEnum@CLASS.getValue()}
              and class.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
              and (class.name like concat('%', #{query.keywords}, '%')
@@ -54,7 +54,7 @@
     </select>
 
     <!--获取学院/专业/班级表单-->
-    <select id="selectUnitForm" resultType="cloud.ciky.business.model.form.EduUnitForm">
+    <select id="selectEducationForm" resultType="cloud.ciky.business.model.form.EducationForm">
         select
             edu.id,
             edu.parent_id,
@@ -63,11 +63,11 @@
             edu.grade_year,
             t.id        as headTeacherId,
             t.real_name as headTeacher
-        from edu_unit edu
+        from education edu
              left join class_teacher ct on ct.class_id = edu.id and ct.is_current = 1
-                and edu.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
+                and edu.type = ${@cloud.ciky.business.enums.EducationTypeEnum@CLASS.getValue()}
              left join user_teacher t on t.id = ct.teacher_id and t.delflag = 0
-                and edu.type = ${@cloud.ciky.business.enums.EduUnitTypeEnum@CLASS.getValue()}
+                and edu.type = ${@cloud.ciky.business.enums.EducationTypeEnum@CLASS.getValue()}
         where edu.id = #{id} and edu.delflag = 0
     </select>
 

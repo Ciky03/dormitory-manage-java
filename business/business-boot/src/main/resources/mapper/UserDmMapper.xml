@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cloud.ciky.business.mapper.UserDormitoryManagerMapper">
+<mapper namespace="cloud.ciky.business.mapper.UserDmMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.UserDormitoryManager">
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.UserDm">
         <id column="id" property="id" />
         <result column="real_name" property="realName" />
         <result column="dm_num" property="dmNum" />
@@ -21,16 +21,16 @@
     </sql>
 
     <!-- 获取宿管分页列表 -->
-    <select id="selectDormitoryManagerPage" resultType="cloud.ciky.business.model.vo.DormitoryManagerPageVO">
+    <select id="selectDormitoryManagerPage" resultType="cloud.ciky.business.model.vo.DmPageVO">
         select
             dm.id,
             dm.real_name as realName,
             dm.dm_num as dmNum,
             dm.entry_date as entryDate,
             group_concat(ifnull(r.room_num, '') order by r.room_num, r.create_time) as building
-        from user_dormitory_manager dm
+        from user_dm dm
             left join building_dm bd on bd.dm_id = dm.id and bd.is_current = 1
-            left join dm_room r on r.id = bd.building_id and r.delflag = 0
+            left join dormitory r on r.id = bd.building_id and r.delflag = 0
                     and r.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
         where dm.delflag = 0
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
@@ -41,9 +41,9 @@
         order by dm.create_time desc
     </select>
 
-    <!--UserDormitoryManagerForm参数映射-->
-    <resultMap id="dmFormResultMap" type="cloud.ciky.business.model.form.UserDormitoryManagerForm">
-        <!--user_dormitory_manager表字段-->
+    <!--UserDmForm参数映射-->
+    <resultMap id="dmFormResultMap" type="cloud.ciky.business.model.form.UserDmForm">
+        <!--user_dm表字段-->
         <id property="id" column="dm_id"/>
         <result property="realName" column="dm_real_name"/>
         <result property="dmNum" column="dm_num"/>
@@ -73,9 +73,9 @@
                u.user_type,
                u.phone,
                u.email
-        from dm_business.user_dormitory_manager dm
+        from dm_business.user_dm dm
                  left join dm_system.sys_user u on u.business_user_id = dm.id and u.delflag = 0
-            and u.user_type = ${@cloud.ciky.system.enums.UserTypeEnum@DORMITORY_MANAGER.getValue()}
+            and u.user_type = ${@cloud.ciky.base.enums.UserTypeEnum@DORMITORY_MANAGER.getValue()}
         where dm.id = #{id}
           and dm.delflag = 0
     </select>

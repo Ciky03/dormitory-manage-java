@@ -14,7 +14,7 @@
     <select id="findBuildingIdsByDmId" resultType="java.lang.String" parameterType="java.lang.String">
         select bd.building_id
         from dm_business.building_dm bd
-                 left join dm_business.dm_room r on r.id = bd.building_id and r.delflag = 0
+                 left join dm_business.dormitory r on r.id = bd.building_id and r.delflag = 0
         where bd.dm_id = #{dmId}
           and bd.is_current = 1
     </select>
@@ -31,7 +31,7 @@
     <select id="findRoomIdByStudentId" resultType="java.lang.String" parameterType="java.lang.String">
         select rs.room_id
         from dm_business.room_student rs
-                 left join dm_business.dm_room r on r.id = rs.room_id and r.delflag = 0
+                 left join dm_business.dormitory r on r.id = rs.room_id and r.delflag = 0
         where rs.student_id = #{studentId} and rs.is_current = 1
     </select>
 

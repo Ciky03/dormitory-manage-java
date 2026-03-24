@@ -1,13 +1,11 @@
 package cloud.ciky.business.model.entity;
 
 import cloud.ciky.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,8 +19,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("user_dormitory_manager")
-public class UserDormitoryManager extends BaseEntity {
+@TableName("user_dm")
+public class UserDm extends BaseEntity {
 
     /**
      * 真实姓名

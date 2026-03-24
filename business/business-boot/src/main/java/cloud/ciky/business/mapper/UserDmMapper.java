@@ -1,9 +1,9 @@
 package cloud.ciky.business.mapper;
 
 import cloud.ciky.base.BaseQuery;
-import cloud.ciky.business.model.entity.UserDormitoryManager;
-import cloud.ciky.business.model.form.UserDormitoryManagerForm;
-import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
+import cloud.ciky.business.model.entity.UserDm;
+import cloud.ciky.business.model.form.UserDmForm;
+import cloud.ciky.business.model.vo.DmPageVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,7 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2026-03-14 11:40:01
  */
 @Mapper
-public interface UserDormitoryManagerMapper extends BaseMapper<UserDormitoryManager> {
+public interface UserDmMapper extends BaseMapper<UserDm> {
 
     /**
      * <p>
@@ -28,9 +28,9 @@ public interface UserDormitoryManagerMapper extends BaseMapper<UserDormitoryMana
      * @since 2026/3/16 16:21
      * @param objectPage 分页对象
      * @param query 查询对象
-     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DormitoryManagerPageVO>
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DmPageVO>
      */
-    Page<DormitoryManagerPageVO> selectDormitoryManagerPage(Page<Object> objectPage, BaseQuery query);
+    Page<DmPageVO> selectDormitoryManagerPage(Page<Object> objectPage, BaseQuery query);
 
     /**
      * <p>
@@ -40,7 +40,7 @@ public interface UserDormitoryManagerMapper extends BaseMapper<UserDormitoryMana
      * @author ciky
      * @since 2026/3/16 16:21
      * @param id 主键
-     * @return cloud.ciky.business.model.form.UserDormitoryManagerForm
+     * @return cloud.ciky.business.model.form.UserDmForm
      */
-    UserDormitoryManagerForm selectDormitoryManagerForm(String id);
+    UserDmForm selectDormitoryManagerForm(String id);
 }

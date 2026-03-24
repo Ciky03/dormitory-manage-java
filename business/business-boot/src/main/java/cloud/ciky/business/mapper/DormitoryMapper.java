@@ -1,10 +1,10 @@
 package cloud.ciky.business.mapper;
 
-import cloud.ciky.business.model.entity.DmRoom;
-import cloud.ciky.business.model.form.DmRoomForm;
+import cloud.ciky.business.model.entity.Dormitory;
+import cloud.ciky.business.model.form.DormitoryForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
 import cloud.ciky.business.model.query.RoomTreeQuery;
-import cloud.ciky.business.model.vo.DmRoomTreeVO;
+import cloud.ciky.business.model.vo.DormitoryTreeVO;
 import cloud.ciky.business.model.vo.RoomPageVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2026-03-11 17:04:20
  */
 @Mapper
-public interface DmRoomMapper extends BaseMapper<DmRoom> {
+public interface DormitoryMapper extends BaseMapper<Dormitory> {
 
     /**
      * <p>
@@ -31,9 +31,9 @@ public interface DmRoomMapper extends BaseMapper<DmRoom> {
      * @author ciky
      * @since 2026/3/23 17:56
      * @param query 查询对象
-     * @return java.util.List<cloud.ciky.business.model.vo.DmRoomTreeVO>
+     * @return java.util.List<cloud.ciky.business.model.vo.DormitoryTreeVO>
      */
-    List<DmRoomTreeVO> selectBuildingRoomList(RoomTreeQuery query);
+    List<DormitoryTreeVO> selectBuildingRoomList(RoomTreeQuery query);
 
     /**
      * <p>
@@ -54,11 +54,11 @@ public interface DmRoomMapper extends BaseMapper<DmRoom> {
      * </p>
      *
      * @param id 主键
-     * @return cloud.ciky.business.model.form.DmRoomForm
+     * @return cloud.ciky.business.model.form.DormitoryForm
      * @author ciky
      * @since 2026/3/11 17:04
      */
-    DmRoomForm selectRoomForm(String id);
+    DormitoryForm selectRoomForm(String id);
 
 
 }

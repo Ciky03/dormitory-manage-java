@@ -1,9 +1,9 @@
 package cloud.ciky.business.service;
 
 import cloud.ciky.base.BaseQuery;
-import cloud.ciky.business.model.entity.UserDormitoryManager;
-import cloud.ciky.business.model.form.UserDormitoryManagerForm;
-import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
+import cloud.ciky.business.model.entity.UserDm;
+import cloud.ciky.business.model.form.UserDmForm;
+import cloud.ciky.business.model.vo.DmPageVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author ciky
  * @since 2026-03-14 11:40:01
  */
-public interface UserDormitoryManagerService extends IService<UserDormitoryManager> {
+public interface UserDmService extends IService<UserDm> {
 
     /**
      * <p>
@@ -25,9 +25,9 @@ public interface UserDormitoryManagerService extends IService<UserDormitoryManag
      * @author ciky
      * @since 2026/3/16 16:21
      * @param query 查询对象
-     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DormitoryManagerPageVO>
+     * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DmPageVO>
      */
-    Page<DormitoryManagerPageVO> listDormitoryManager(BaseQuery query);
+    Page<DmPageVO> listDormitoryManager(BaseQuery query);
 
     /**
      * <p>
@@ -37,9 +37,9 @@ public interface UserDormitoryManagerService extends IService<UserDormitoryManag
      * @author ciky
      * @since 2026/3/16 16:21
      * @param id 主键
-     * @return cloud.ciky.business.model.form.UserDormitoryManagerForm
+     * @return cloud.ciky.business.model.form.UserDmForm
      */
-    UserDormitoryManagerForm getDormitoryManagerForm(String id);
+    UserDmForm getDormitoryManagerForm(String id);
 
     /**
      * <p>
@@ -63,5 +63,5 @@ public interface UserDormitoryManagerService extends IService<UserDormitoryManag
      * @param form
      * @return boolean
      */
-    boolean saveDormitoryManager(UserDormitoryManagerForm form);
+    boolean saveDormitoryManager(UserDmForm form);
 }

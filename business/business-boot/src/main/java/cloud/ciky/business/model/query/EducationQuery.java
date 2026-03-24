@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "学院/专业/班级查询对象")
-public class UnitQuery {
+public class EducationQuery {
 
     @Schema(description = "是否查询所有(1-学院/专业/班级, 0-学院/专业)")
     private Boolean queryAll;

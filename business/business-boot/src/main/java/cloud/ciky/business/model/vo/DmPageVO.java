@@ -17,7 +17,7 @@ import java.time.LocalDate;
  */
 @Data
 @Schema(description = "宿管分页视图对象")
-public class DormitoryManagerPageVO {
+public class DmPageVO {
 
     @Schema(description = "id")
     private String id;

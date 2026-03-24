@@ -1,6 +1,5 @@
 package cloud.ciky.business.model.form;
 
-import io.seata.core.protocol.MergedWarpMessage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +15,7 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "学院/专业/班级表单对象")
-public class EduUnitForm {
+public class EducationForm {
 
     @Schema(description = "id")
     private String id;

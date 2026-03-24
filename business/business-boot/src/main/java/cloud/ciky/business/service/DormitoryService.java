@@ -1,12 +1,10 @@
 package cloud.ciky.business.service;
 
-import cloud.ciky.base.BasePageQuery;
-import cloud.ciky.base.model.KeyValue;
-import cloud.ciky.business.model.entity.DmRoom;
-import cloud.ciky.business.model.form.DmRoomForm;
+import cloud.ciky.business.model.entity.Dormitory;
+import cloud.ciky.business.model.form.DormitoryForm;
 import cloud.ciky.business.model.query.RoomPageQuery;
 import cloud.ciky.business.model.query.RoomTreeQuery;
-import cloud.ciky.business.model.vo.DmRoomTreeVO;
+import cloud.ciky.business.model.vo.DormitoryTreeVO;
 import cloud.ciky.business.model.vo.RoomPageVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,7 +19,7 @@ import java.util.List;
  * @author ciky
  * @since 2026-03-11 17:04:20
  */
-public interface DmRoomService extends IService<DmRoom> {
+public interface DormitoryService extends IService<Dormitory> {
 
     /**
      * <p>
@@ -30,9 +28,9 @@ public interface DmRoomService extends IService<DmRoom> {
      *
      * @author ciky
      * @since 2026/3/19 17:04
-     * @return java.util.List<cloud.ciky.business.model.vo.DmRoomTreeVO>
+     * @return java.util.List<cloud.ciky.business.model.vo.DormitoryTreeVO>
      */
-    List<DmRoomTreeVO> listBuildingRoomTree(RoomTreeQuery query);
+    List<DormitoryTreeVO> listBuildingRoomTree(RoomTreeQuery query);
 
     /**
      * <p>
@@ -52,11 +50,11 @@ public interface DmRoomService extends IService<DmRoom> {
      * </p>
      *
      * @param id 主键
-     * @return cloud.ciky.business.model.form.DmRoomForm
+     * @return cloud.ciky.business.model.form.DormitoryForm
      * @author ciky
      * @since 2026/3/11 17:04
      */
-    DmRoomForm getRoomForm(String id);
+    DormitoryForm getRoomForm(String id);
 
     /**
      * <p>
@@ -68,7 +66,7 @@ public interface DmRoomService extends IService<DmRoom> {
      * @author ciky
      * @since 2026/3/11 17:04
      */
-    boolean saveRoom(DmRoomForm form);
+    boolean saveRoom(DormitoryForm form);
 
     /**
      * <p>

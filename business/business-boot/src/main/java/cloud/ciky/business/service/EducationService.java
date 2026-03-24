@@ -1,12 +1,11 @@
 package cloud.ciky.business.service;
 
-import cloud.ciky.base.result.PageResult;
-import cloud.ciky.business.model.entity.EduUnit;
-import cloud.ciky.business.model.form.EduUnitForm;
+import cloud.ciky.business.model.entity.Education;
+import cloud.ciky.business.model.form.EducationForm;
 import cloud.ciky.business.model.query.ClassPageQuery;
-import cloud.ciky.business.model.query.UnitQuery;
+import cloud.ciky.business.model.query.EducationQuery;
 import cloud.ciky.business.model.vo.ClassPageVO;
-import cloud.ciky.business.model.vo.EduUnitVO;
+import cloud.ciky.business.model.vo.EducationVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,7 +19,7 @@ import java.util.List;
  * @author ciky
  * @since 2026-02-05 17:03:26
  */
-public interface EduUnitService extends IService<EduUnit> {
+public interface EducationService extends IService<Education> {
 
     /**
      * <p>
@@ -30,9 +29,9 @@ public interface EduUnitService extends IService<EduUnit> {
      * @author ciky
      * @since 2026/2/5 17:27
      * @param query 查询对象
-     * @return java.util.List<cloud.ciky.business.model.vo.EduUnitVO>
+     * @return java.util.List<cloud.ciky.business.model.vo.EducationVO>
      */
-    List<EduUnitVO> listUnitTree(UnitQuery query);
+    List<EducationVO> listEducationTree(EducationQuery query);
 
     /**
      * <p>
@@ -56,7 +55,7 @@ public interface EduUnitService extends IService<EduUnit> {
      * @param form 表单对象
      * @return boolean
      */
-    boolean saveUnit(EduUnitForm form);
+    boolean saveEducation(EducationForm form);
 
     /**
      * <p>
@@ -66,9 +65,9 @@ public interface EduUnitService extends IService<EduUnit> {
      * @author ciky
      * @since 2026/3/11 11:06
      * @param id 主键
-     * @return cloud.ciky.business.model.form.EduUnitForm
+     * @return cloud.ciky.business.model.form.EducationForm
      */
-    EduUnitForm getUnitForm(String id);
+    EducationForm getEducationForm(String id);
 
     /**
      * <p>
@@ -80,5 +79,5 @@ public interface EduUnitService extends IService<EduUnit> {
      * @param id 主键
      * @return boolean
      */
-    boolean deleteUnit(String id);
+    boolean deleteEducation(String id);
 }

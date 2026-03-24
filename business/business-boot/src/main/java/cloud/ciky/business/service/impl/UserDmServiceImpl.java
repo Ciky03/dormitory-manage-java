@@ -3,11 +3,11 @@ package cloud.ciky.business.service.impl;
 import cloud.ciky.base.BaseQuery;
 import cloud.ciky.base.enums.DelflagEnum;
 import cloud.ciky.base.exception.BusinessException;
-import cloud.ciky.business.mapper.UserDormitoryManagerMapper;
-import cloud.ciky.business.model.entity.UserDormitoryManager;
-import cloud.ciky.business.model.form.UserDormitoryManagerForm;
-import cloud.ciky.business.model.vo.DormitoryManagerPageVO;
-import cloud.ciky.business.service.UserDormitoryManagerService;
+import cloud.ciky.business.mapper.UserDmMapper;
+import cloud.ciky.business.model.entity.UserDm;
+import cloud.ciky.business.model.form.UserDmForm;
+import cloud.ciky.business.model.vo.DmPageVO;
+import cloud.ciky.business.service.UserDmService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
 import cloud.ciky.base.enums.UserTypeEnum;
@@ -35,17 +35,17 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserDormitoryManagerServiceImpl extends ServiceImpl<UserDormitoryManagerMapper, UserDormitoryManager> implements UserDormitoryManagerService {
+public class UserDmServiceImpl extends ServiceImpl<UserDmMapper, UserDm> implements UserDmService {
 
     private final UserFeignClient userFeignClient;
 
     @Override
-    public Page<DormitoryManagerPageVO> listDormitoryManager(BaseQuery query) {
+    public Page<DmPageVO> listDormitoryManager(BaseQuery query) {
         return this.baseMapper.selectDormitoryManagerPage(new Page<>(query.getPageNum(), query.getPageSize()), query);
     }
 
     @Override
-    public UserDormitoryManagerForm getDormitoryManagerForm(String id) {
+    public UserDmForm getDormitoryManagerForm(String id) {
         return this.baseMapper.selectDormitoryManagerForm(id);
     }
 
@@ -54,11 +54,11 @@ public class UserDormitoryManagerServiceImpl extends ServiceImpl<UserDormitoryMa
     public boolean deleteDormitoryManager(String id) {
         String optUser = SecurityUtils.getUserId();
         // 逻辑删除,方便溯源
-        boolean update = this.update(new LambdaUpdateWrapper<UserDormitoryManager>()
-                .set(UserDormitoryManager::getDelflag, DelflagEnum.REMOVED.getValue())
-                .set(UserDormitoryManager::getUpdateBy, optUser)
-                .set(UserDormitoryManager::getUpdateTime, LocalDateTime.now())
-                .eq(UserDormitoryManager::getId, id));
+        boolean update = this.update(new LambdaUpdateWrapper<UserDm>()
+                .set(UserDm::getDelflag, DelflagEnum.REMOVED.getValue())
+                .set(UserDm::getUpdateBy, optUser)
+                .set(UserDm::getUpdateTime, LocalDateTime.now())
+                .eq(UserDm::getId, id));
 
         // 系统用户表解绑
         if (update) {
@@ -69,21 +69,21 @@ public class UserDormitoryManagerServiceImpl extends ServiceImpl<UserDormitoryMa
 
     @Override
     @GlobalTransactional(rollbackFor = Exception.class)
-    public boolean saveDormitoryManager(UserDormitoryManagerForm form) {
+    public boolean saveDormitoryManager(UserDmForm form) {
         String optUser = SecurityUtils.getUserId();
         String dmId = form.getId();
         String dmNum = form.getDmNum();
         String realName = form.getRealName();
 
-        long dmCount = this.count(new LambdaQueryWrapper<UserDormitoryManager>()
-                .ne(UserDormitoryManager::getId, dmId)
-                .eq(UserDormitoryManager::getDmNum, dmNum)
-                .eq(UserDormitoryManager::getDelflag, DelflagEnum.USABLE.getValue()));
+        long dmCount = this.count(new LambdaQueryWrapper<UserDm>()
+                .ne(UserDm::getId, dmId)
+                .eq(UserDm::getDmNum, dmNum)
+                .eq(UserDm::getDelflag, DelflagEnum.USABLE.getValue()));
         if (dmCount > 0) {
             throw new BusinessException("该工号已存在，请修改后重试!");
         }
 
-        UserDormitoryManager entity = new UserDormitoryManager();
+        UserDm entity = new UserDm();
         if (CharSequenceUtil.isBlank(dmId)) {
             entity.setCreateBy(optUser);
         } else {
