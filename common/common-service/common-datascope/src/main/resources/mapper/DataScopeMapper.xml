@@ -2,11 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cloud.ciky.datascope.mapper.DataScopeMapper">
 
+    <!--查询用户角色code-->
     <select id="findRoleCodesByUserId" resultType="java.lang.String">
         select r.code
         from dm_system.sys_user_role ur
                  join dm_system.sys_role r on ur.role_id = r.id
         where ur.user_id = #{userId}
+    </select>
+
+    <!--根据宿管id查询楼栋id-->
+    <select id="findBuildingIdsByDmId" resultType="java.lang.String" parameterType="java.lang.String">
+        select bd.building_id
+        from dm_business.building_dm bd
+                 left join dm_business.dm_room r on r.id = bd.building_id and r.delflag = 0
+        where bd.dm_id = #{dmId}
+          and bd.is_current = 1
+    </select>
+
+    <!--根据教师id查询学生id-->
+    <select id="findStudentIdByTeacherId" resultType="java.lang.String" parameterType="java.lang.String">
+        select cs.student_id
+        from dm_business.class_teacher ct
+            left join dm_business.class_student cs on cs.class_id = ct.class_id
+        where ct.teacher_id = #{teacherId} and ct.is_current = 1 and cs.is_current = 1
+    </select>
+
+    <!--根据学生id查询宿舍id-->
+    <select id="findRoomIdByStudentId" resultType="java.lang.String" parameterType="java.lang.String">
+        select rs.room_id
+        from dm_business.room_student rs
+                 left join dm_business.dm_room r on r.id = rs.room_id and r.delflag = 0
+        where rs.student_id = #{studentId} and rs.is_current = 1
     </select>
 
 </mapper>

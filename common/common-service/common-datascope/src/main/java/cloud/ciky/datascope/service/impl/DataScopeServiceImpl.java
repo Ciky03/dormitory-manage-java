@@ -25,4 +25,19 @@ public class DataScopeServiceImpl implements DataScopeService{
        return dataScopeMapper.findRoleCodesByUserId(userId);
     }
 
+    @Override
+    public List<String> findBuildingIdsByDmId(String dmId) {
+        return dataScopeMapper.findBuildingIdsByDmId(dmId);
+    }
+
+    @Override
+    public List<String> findStudentIdByTeacherId(String teacherId) {
+        return dataScopeMapper.findStudentIdByTeacherId(teacherId);
+    }
+
+    @Override
+    public String findRoomIdByStudentId(String studentId) {
+        return dataScopeMapper.findRoomIdByStudentId(studentId);
+    }
+
 }
