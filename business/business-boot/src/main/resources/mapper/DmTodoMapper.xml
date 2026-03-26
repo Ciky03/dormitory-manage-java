@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cloud.ciky.business.mapper.DmTodoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmTodo">
+        <id column="id" property="id" />
+        <result column="room_id" property="roomId" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="priority" property="priority" />
+        <result column="status" property="status" />
+        <result column="assignee_student_id" property="assigneeStudentId" />
+        <result column="creator_student_id" property="creatorStudentId" />
+        <result column="due_time" property="dueTime" />
+        <result column="start_time" property="startTime" />
+        <result column="completed_time" property="completedTime" />
+        <result column="completed_by" property="completedBy" />
+        <result column="cancel_reason" property="cancelReason" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="delflag" property="delflag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, room_id, title, content, priority, status, assignee_student_id, creator_student_id, due_time, start_time, completed_time, completed_by, cancel_reason, create_by, create_time, update_by, update_time, delflag
+    </sql>
+
+</mapper>
