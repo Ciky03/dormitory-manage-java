@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="room_id" property="roomId" />
         <result column="version_no" property="versionNo" />
-        <result column="is_current" property="current" />
+        <result column="is_current" property="isCurrent" />
         <result column="title" property="title" />
         <result column="content_md" property="contentMd" />
         <result column="status" property="status" />
@@ -24,5 +24,62 @@
     <sql id="Base_Column_List">
         id, room_id, version_no, is_current, title, content_md, status, publish_by, publish_time, create_by, create_time, update_by, update_time, delflag
     </sql>
+
+    <!--查询当前宿舍公约-->
+    <select id="selectConventionInfo" resultType="cloud.ciky.business.model.vo.DmConventionVO">
+        select c.id,
+               c.room_id,
+               concat(ifnull(b.room_num, ''), ifnull(r.room_num, '')) as roomName,
+               c.version_no,
+               c.title,
+               c.content_md,
+               c.status,
+               u.real_name                                            as publishBy,
+               c.publish_time,
+                u2.real_name                                           as updateBy,
+                coalesce(c.update_time, c.create_time)                 as updateTime
+        from dm_convention c
+                 join room_student rs on rs.room_id = c.room_id and rs.student_id = #{studentId} and rs.is_current = 1
+                 left join dormitory r on r.id = c.room_id and r.delflag = 0
+                      and r.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+                 left join dormitory b on b.id = r.parent_id and b.delflag = 0
+                      and b.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+                 left join dm_system.sys_user u on u.id = c.publish_by and u.delflag = 0
+                 left join dm_system.sys_user u2 on u2.id = coalesce(c.update_by, c.create_by) and u2.delflag = 0
+        where c.delflag = 0
+              <if test="conventionId != null">
+                  and c.id = #{conventionId}
+              </if>
+              <if test="conventionId == null">
+                  and c.is_current = 1
+              </if>
+        order by c.version_no desc
+        limit 1
+    </select>
+
+    <!--获取宿舍公约历史/草稿-->
+    <select id="selectHistoryConvention" resultType="cloud.ciky.business.model.vo.HistoryConventionVO">
+        select c.id,
+               c.version_no,
+               c.title,
+               c.status,
+               c.publish_time,
+               su1.real_name                          as publishBy,
+               coalesce(c.update_time, c.create_time) as updateTime,
+               coalesce(c.update_by, c.create_by)     as updateUserId,
+               su2.real_name                          as updateBy
+        from dm_convention c
+                 left join dm_system.sys_user su1 on su1.id = c.publish_by and c.publish_by IS NOT NULL
+                 left join dm_system.sys_user su2 on su2.id = coalesce(c.update_by, c.create_by)
+        where c.delflag = 0
+          and c.room_id = #{roomId}
+        order by case c.status
+                     when 1 then 1
+                     when 0 then 2
+                     when 2 then 3
+                     else 4 end,
+                 c.version_no desc,
+                 coalesce(c.update_time, c.create_time) desc
+    </select>
 
 </mapper>

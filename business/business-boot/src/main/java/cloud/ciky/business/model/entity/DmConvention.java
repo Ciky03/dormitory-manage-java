@@ -39,7 +39,7 @@ public class DmConvention extends BaseEntity {
      * 是否当前版本:1-是 0-否
      */
     @TableField("is_current")
-    private Boolean current;
+    private Boolean isCurrent;
 
     /**
      * 标题
