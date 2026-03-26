@@ -1,14 +1,12 @@
 package cloud.ciky.business.model.entity;
 
 import cloud.ciky.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -45,13 +43,13 @@ public class DmTodo extends BaseEntity {
      * 优先级 1-低 2-中 3-高
      */
     @TableField("priority")
-    private Boolean priority;
+    private Integer priority;
 
     /**
      * 状态 0-待处理 1-进行中 2-已完成 3-已取消
      */
     @TableField("status")
-    private Boolean status;
+    private Integer status;
 
     /**
      * 负责人学生ID
@@ -94,5 +92,4 @@ public class DmTodo extends BaseEntity {
      */
     @TableField("cancel_reason")
     private String cancelReason;
-
 }

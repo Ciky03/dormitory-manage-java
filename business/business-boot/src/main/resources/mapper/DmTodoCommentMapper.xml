@@ -2,22 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cloud.ciky.business.mapper.DmTodoCommentMapper">
 
-    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmTodoComment">
-        <id column="id" property="id" />
-        <result column="todo_id" property="todoId" />
-        <result column="commenter_student_id" property="commenterStudentId" />
-        <result column="content" property="content" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="update_time" property="updateTime" />
-        <result column="delflag" property="delflag" />
+        <id column="id" property="id"/>
+        <result column="todo_id" property="todoId"/>
+        <result column="commenter_student_id" property="commenterStudentId"/>
+        <result column="content" property="content"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="delflag" property="delflag"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, todo_id, commenter_student_id, content, create_by, create_time, update_by, update_time, delflag
     </sql>
+
+    <select id="listCommentByTodoId" resultType="cloud.ciky.business.model.vo.DmTodoCommentVO">
+        select c.id,
+               c.todo_id as todoId,
+               c.commenter_student_id as commenterStudentId,
+               us.real_name as commenterName,
+               c.content,
+               c.create_time as createTime
+        from dm_todo_comment c
+                 left join user_student us on us.id = c.commenter_student_id and us.delflag = 0
+        where c.delflag = 0
+          and c.todo_id = #{todoId}
+        order by c.create_time asc
+    </select>
 
 </mapper>

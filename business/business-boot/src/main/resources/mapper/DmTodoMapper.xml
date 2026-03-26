@@ -2,31 +2,153 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cloud.ciky.business.mapper.DmTodoMapper">
 
-    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmTodo">
-        <id column="id" property="id" />
-        <result column="room_id" property="roomId" />
-        <result column="title" property="title" />
-        <result column="content" property="content" />
-        <result column="priority" property="priority" />
-        <result column="status" property="status" />
-        <result column="assignee_student_id" property="assigneeStudentId" />
-        <result column="creator_student_id" property="creatorStudentId" />
-        <result column="due_time" property="dueTime" />
-        <result column="start_time" property="startTime" />
-        <result column="completed_time" property="completedTime" />
-        <result column="completed_by" property="completedBy" />
-        <result column="cancel_reason" property="cancelReason" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="update_time" property="updateTime" />
-        <result column="delflag" property="delflag" />
+        <id column="id" property="id"/>
+        <result column="room_id" property="roomId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="priority" property="priority"/>
+        <result column="status" property="status"/>
+        <result column="assignee_student_id" property="assigneeStudentId"/>
+        <result column="creator_student_id" property="creatorStudentId"/>
+        <result column="due_time" property="dueTime"/>
+        <result column="start_time" property="startTime"/>
+        <result column="completed_time" property="completedTime"/>
+        <result column="completed_by" property="completedBy"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="delflag" property="delflag"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, room_id, title, content, priority, status, assignee_student_id, creator_student_id, due_time, start_time, completed_time, completed_by, cancel_reason, create_by, create_time, update_by, update_time, delflag
+        id, room_id, title, content, priority, status, assignee_student_id, creator_student_id, due_time,
+        start_time, completed_time, completed_by, cancel_reason, create_by, create_time, update_by, update_time,
+        delflag
     </sql>
+
+    <select id="selectTodoStat" resultType="cloud.ciky.business.model.vo.DmTodoStatVO">
+        select r.id as roomId,
+               b.room_num as buildingNum,
+               r.room_num as roomNum,
+               count(t.id) as totalCount,
+               coalesce(sum(case when t.status = 0 then 1 else 0 end), 0) as pendingCount,
+               coalesce(sum(case when t.status = 1 then 1 else 0 end), 0) as processingCount,
+               coalesce(sum(case
+                                when t.status = 2
+                                    and t.completed_time <![CDATA[ >= ]]> #{weekStart}
+                                    and t.completed_time <![CDATA[ < ]]> #{weekEnd}
+                                    then 1
+                                else 0
+                            end), 0) as weekCompletedCount
+        from dormitory r
+                 left join dormitory b on b.id = r.parent_id and b.delflag = 0
+                 left join dm_todo t on t.room_id = r.id and t.delflag = 0
+        where r.id = #{roomId}
+          and r.delflag = 0
+        group by r.id, b.room_num, r.room_num
+    </select>
+
+    <select id="selectTodoPage" resultType="cloud.ciky.business.model.vo.DmTodoPageVO">
+        select t.id,
+               t.title,
+               substring(trim(t.content), 1, 40) as summary,
+               t.priority,
+               t.status,
+               t.assignee_student_id as assigneeStudentId,
+               ua.real_name as assigneeName,
+               t.creator_student_id as creatorStudentId,
+               uc.real_name as creatorName,
+               t.due_time as dueTime,
+               t.create_time as createTime,
+               case
+                   when t.due_time is not null and t.status in (0, 1) and t.due_time <![CDATA[ < ]]> #{now}
+                       then 1
+                   else 0
+                   end as overdue
+        from dm_todo t
+                 left join user_student ua on ua.id = t.assignee_student_id and ua.delflag = 0
+                 left join user_student uc on uc.id = t.creator_student_id and uc.delflag = 0
+        where t.delflag = 0
+          and t.room_id = #{roomId}
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and (t.title like concat('%', #{query.keywords}, '%')
+            or t.content like concat('%', #{query.keywords}, '%'))
+        </if>
+        <if test="query.state != null">
+            and t.status = #{query.state}
+        </if>
+        <if test="query.priority != null">
+            and t.priority = #{query.priority}
+        </if>
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.assigneeStudentId)">
+            and t.assignee_student_id = #{query.assigneeStudentId}
+        </if>
+        <if test="query.dueType != null and query.dueType == 1">
+            and t.due_time is not null
+            and date(t.due_time) = current_date()
+        </if>
+        <if test="query.dueType != null and query.dueType == 2">
+            and t.due_time is not null
+            and t.due_time <![CDATA[ >= ]]> #{now}
+            and t.due_time <![CDATA[ < ]]> date_add(#{now}, interval 3 day)
+        </if>
+        <if test="query.dueType != null and query.dueType == 3">
+            and t.due_time is not null
+            and t.status in (0, 1)
+            and t.due_time <![CDATA[ < ]]> #{now}
+        </if>
+        order by case when t.status in (0, 1) then 0 else 1 end,
+                 t.priority desc,
+                 case when t.due_time is null then 1 else 0 end,
+                 t.due_time asc,
+                 t.create_time desc
+    </select>
+
+    <select id="selectTodoDetail" resultType="cloud.ciky.business.model.vo.DmTodoDetailVO">
+        select t.id,
+               t.title,
+               t.content,
+               t.priority,
+               t.status,
+               t.assignee_student_id as assigneeStudentId,
+               ua.real_name as assigneeName,
+               t.creator_student_id as creatorStudentId,
+               uc.real_name as creatorName,
+               t.due_time as dueTime,
+               t.start_time as startTime,
+               t.completed_time as completedTime,
+               t.completed_by as completedBy,
+               ub.real_name as completedByName,
+               t.cancel_reason as cancelReason
+        from dm_todo t
+                 left join user_student ua on ua.id = t.assignee_student_id and ua.delflag = 0
+                 left join user_student uc on uc.id = t.creator_student_id and uc.delflag = 0
+                 left join user_student ub on ub.id = t.completed_by and ub.delflag = 0
+        where t.id = #{id}
+          and t.room_id = #{roomId}
+          and t.delflag = 0
+        limit 1
+    </select>
+
+    <select id="listAssigneeOptions" resultType="cloud.ciky.base.model.Option">
+        select rs.student_id as value,
+               us.real_name as label
+        from room_student rs
+                 join user_student us on us.id = rs.student_id and us.delflag = 0
+        where rs.room_id = #{roomId}
+          and rs.is_current = 1
+        order by us.real_name
+    </select>
+
+    <select id="countCurrentRoomStudent" resultType="java.lang.Integer">
+        select count(1)
+        from room_student
+        where room_id = #{roomId}
+          and student_id = #{studentId}
+          and is_current = 1
+    </select>
 
 </mapper>
