@@ -10,6 +10,7 @@ import cloud.ciky.business.model.vo.DmConventionVO;
 import cloud.ciky.business.model.vo.HistoryConventionVO;
 import cloud.ciky.business.service.DmConventionService;
 import cloud.ciky.business.service.RoomStudentService;
+import cloud.ciky.business.utils.UserInfoUtil;
 import cloud.ciky.security.util.SecurityUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -42,7 +43,7 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
 
     @Override
     public DmConventionVO getCurrentConvention() {
-        String studentId = SecurityUtils.getBusinessUserId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         return this.baseMapper.selectConventionInfo(studentId, null);
     }
 
@@ -58,7 +59,7 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
 
     @Override
     public DmConventionVO getConventionForm(String id) {
-        String studentId = SecurityUtils.getBusinessUserId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         return this.baseMapper.selectConventionInfo(studentId, id);
     }
 
@@ -132,7 +133,7 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
     }
 
     /**
-     * 获取宿舍制定公约
+     * 获取宿舍指定公约
      */
     private DmConvention getConvention(String id, String roomId) {
         DmConvention entity = this.getOne(new LambdaQueryWrapper<DmConvention>()
@@ -147,21 +148,10 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
     }
 
     /**
-     * 获取当前学生id
-     */
-    private String getCurrentStudentId() {
-        String studentId = SecurityUtils.getBusinessUserId();
-        if (CharSequenceUtil.isBlank(studentId)) {
-            throw new BusinessException("未识别到当前学生信息");
-        }
-        return studentId;
-    }
-
-    /**
      * 获取当前宿舍id
      */
     private String getCurrentRoomId() {
-        String roomId = roomStudentService.getSelectedRoomId(getCurrentStudentId());
+        String roomId = roomStudentService.getSelectedRoomId(UserInfoUtil.getCurrentStudentId());
         if (CharSequenceUtil.isBlank(roomId)) {
             throw new BusinessException("当前登录用户未绑定宿舍");
         }

@@ -9,6 +9,7 @@ import cloud.ciky.business.model.vo.DmMemberConventionAckVO;
 import cloud.ciky.business.service.DmConventionAckService;
 import cloud.ciky.business.service.DmConventionService;
 import cloud.ciky.business.service.RoomStudentService;
+import cloud.ciky.business.utils.UserInfoUtil;
 import cloud.ciky.security.util.SecurityUtils;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -37,12 +38,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DmConventionAckServiceImpl extends ServiceImpl<DmConventionAckMapper, DmConventionAck> implements DmConventionAckService {
 
     private final DmConventionService conventionService;
-    private final RoomStudentService roomStudentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean ackConvention(DmConventionAckForm form) {
-        String studentId = getCurrentStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         String optUser = SecurityUtils.getUserId();
         String conventionId = form.getConventionId();
         Boolean agreeFlag = form.getAgreeFlag() != null && form.getAgreeFlag();
@@ -75,7 +75,7 @@ public class DmConventionAckServiceImpl extends ServiceImpl<DmConventionAckMappe
     public DmConventionAckStateVO getAckStat(String conventionId) {
         // 查询当前宿舍合约是否存在
         conventionService.getCurrentRoomConvention(conventionId);
-        String studentId = getCurrentStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
 
         // 获取宿舍成员合约同意情况列表
         List<DmMemberConventionAckVO> memberAckList = this.baseMapper.listMemberConventionAck(conventionId);
@@ -97,12 +97,5 @@ public class DmConventionAckServiceImpl extends ServiceImpl<DmConventionAckMappe
         return stateVO;
     }
 
-    private String getCurrentStudentId() {
-        String studentId = SecurityUtils.getBusinessUserId();
-        if (CharSequenceUtil.isBlank(studentId)) {
-            throw new BusinessException("未识别到当前学生信息");
-        }
-        return studentId;
-    }
 }
 
