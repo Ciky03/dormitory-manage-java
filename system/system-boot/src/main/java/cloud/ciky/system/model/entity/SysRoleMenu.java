@@ -2,6 +2,8 @@ package cloud.ciky.system.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -18,6 +20,7 @@ import lombok.Data;
 @TableName("sys_role_menu")
 public class SysRoleMenu implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -56,11 +59,11 @@ public class SysRoleMenu implements Serializable {
     @TableField("update_time")
     private LocalDateTime updateTime;
 
-    /**
-     * 逻辑删除
-     */
-    @TableField("delflag")
-    private Boolean delflag;
+//    /**
+//     * 逻辑删除
+//     */
+//    @TableField("delflag")
+//    private Boolean delflag;
 
 
 }

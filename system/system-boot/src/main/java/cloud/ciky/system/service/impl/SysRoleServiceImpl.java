@@ -242,7 +242,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                         roleMenu.setMenuId(menuId);
                         roleMenu.setCreateBy(optUser);
                         roleMenu.setCreateTime(now);
-                        roleMenu.setDelflag(false);
                         return roleMenu;
                     })
                     .toList();
