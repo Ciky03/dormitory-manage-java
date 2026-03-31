@@ -100,10 +100,10 @@
         <!--    <artifactId>common-sms</artifactId>-->
         <!--</dependency>-->
 
-        <!--<dependency>-->
-        <!--    <groupId>cloud.ciky</groupId>-->
-        <!--    <artifactId>common-file</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>cloud.ciky</groupId>
+            <artifactId>common-file</artifactId>
+        </dependency>
 
         <!--<dependency>-->
         <!--    <groupId>cloud.ciky</groupId>-->

@@ -1,15 +1,13 @@
 package cloud.ciky.business.model.entity;
 
 import cloud.ciky.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -46,7 +44,7 @@ public class DmSharedCostDetail extends BaseEntity {
      * 缴费状态 0-未缴 1-已缴
      */
     @TableField("pay_status")
-    private Boolean payStatus;
+    private Integer payStatus;
 
     /**
      * 支付时间
@@ -59,5 +57,4 @@ public class DmSharedCostDetail extends BaseEntity {
      */
     @TableField("voucher_attach_id")
     private String voucherAttachId;
-
 }

@@ -40,6 +40,15 @@ public class RoomStudentServiceImpl extends ServiceImpl<RoomStudentMapper, RoomS
     }
 
     @Override
+    public String getSelectedRoomIdThrowExp(String studentId) {
+        String roomId = this.getSelectedRoomId(studentId);
+        if (CharSequenceUtil.isBlank(roomId)) {
+            throw new BusinessException("当前学生暂未分配宿舍");
+        }
+        return roomId;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean saveRoomStudent(RoomStudentForm form) {
         String studentId = form.getStudentId();

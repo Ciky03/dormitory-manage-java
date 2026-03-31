@@ -23,4 +23,25 @@
         id, cost_id, student_id, amount_due, pay_status, paid_time, voucher_attach_id, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <!--查询费用公摊明细列表-->
+    <select id="listSharedCostMember" resultType="cloud.ciky.business.model.vo.DmSharedCostMemberVO">
+        select d.id as detailId,
+               d.student_id as studentId,
+               us.real_name as studentName,
+               d.amount_due as amountDue,
+               d.pay_status as payStatus,
+               d.paid_time as paidTime,
+               d.voucher_attach_id as voucherAttachId,
+               sa.name as voucherName,
+               sa.bucket as voucherBucket,
+               sa.path as voucherPath,
+               case when d.student_id = #{studentId} then 1 else 0 end as isCurrentUser
+        from dm_shared_cost_detail d
+                 left join user_student us on us.id = d.student_id and us.delflag = 0
+                 left join dm_system.sys_attach sa on sa.id = d.voucher_attach_id and sa.delflag = 0
+        where d.cost_id = #{costId}
+          and d.delflag = 0
+        order by us.real_name
+    </select>
+
 </mapper>

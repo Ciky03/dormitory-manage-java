@@ -2,28 +2,142 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cloud.ciky.business.mapper.DmSharedCostMapper">
 
-    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmSharedCost">
-        <id column="id" property="id" />
-        <result column="room_id" property="roomId" />
-        <result column="title" property="title" />
-        <result column="total_amount" property="totalAmount" />
-        <result column="initiator_student_id" property="initiatorStudentId" />
-        <result column="occurred_date" property="occurredDate" />
-        <result column="due_time" property="dueTime" />
-        <result column="status" property="status" />
-        <result column="remark" property="remark" />
-        <result column="source_voucher_attach_id" property="sourceVoucherAttachId" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="update_time" property="updateTime" />
-        <result column="delflag" property="delflag" />
+        <id column="id" property="id"/>
+        <result column="room_id" property="roomId"/>
+        <result column="title" property="title"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="initiator_student_id" property="initiatorStudentId"/>
+        <result column="occurred_date" property="occurredDate"/>
+        <result column="due_time" property="dueTime"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="source_voucher_attach_id" property="sourceVoucherAttachId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="delflag" property="delflag"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, room_id, title, total_amount, initiator_student_id, occurred_date, due_time, status, remark, source_voucher_attach_id, create_by, create_time, update_by, update_time, delflag
+        id, room_id, title, total_amount, initiator_student_id, occurred_date, due_time, status, remark,
+        source_voucher_attach_id, create_by, create_time, update_by, update_time, delflag
     </sql>
 
+    <select id="selectSharedCostStat" resultType="cloud.ciky.business.model.vo.DmSharedCostStatVO">
+        select rs.room_id                                                                                 as roomId,
+               building.room_num                                                                          as buildingNum,
+               room.room_num                                                                              as roomNum,
+               coalesce(sum(case
+                                when d.student_id = #{studentId} and d.pay_status = 0 and c.status = 1
+                                    then d.amount_due
+                                else 0 end), 0)                                                           as myUnpaidAmount,
+               coalesce(sum(case when d.pay_status = 0 and c.status = 1 then d.amount_due else 0 end), 0) as roomUnpaidAmount,
+               coalesce(sum(case
+                                when d.pay_status = 0
+                                    and c.status = 1
+                                    and date_format(c.occurred_date, '%Y-%m') = date_format(current_date, '%Y-%m')
+                                    then d.amount_due
+                                else 0 end),
+                        0)                                                                                as currentMonthRoomUnpaidAmount
+        from room_student rs
+                 left join dormitory room on room.id = rs.room_id and room.delflag = 0
+                             and room.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+                 left join dormitory building on building.id = room.parent_id and building.delflag = 0
+                             and building.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+                 left join dm_shared_cost c on c.room_id = room.id and c.delflag = 0
+                 left join dm_shared_cost_detail d on d.cost_id = c.id and d.delflag = 0
+        where rs.is_current = 1
+          and rs.student_id = #{studentId}
+        group by rs.room_id
+
+    </select>
+
+    <select id="selectSharedCostPage" resultType="cloud.ciky.business.model.vo.DmSharedCostPageVO">
+        select c.id,
+               c.title,
+               c.total_amount as totalAmount,
+               us.real_name as initiatorName,
+               c.occurred_date as occurredDate,
+               c.due_time as dueTime,
+               c.status,
+               d.amount_due as myAmountDue,
+               d.pay_status as myPayStatus
+        from dm_shared_cost c
+                 left join user_student us on us.id = c.initiator_student_id and us.delflag = 0
+                 left join dm_shared_cost_detail d on d.cost_id = c.id and d.student_id = #{query.studentId} and d.delflag = 0
+        where c.room_id = #{query.roomId}
+          and c.delflag = 0
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
+            and( c.title like concat('%', #{query.keywords}, '%')
+                or c.remark like concat('%', #{query.keywords}, '%'))
+        </if>
+        <if test="query.state != null">
+            and c.status = #{query.state}
+        </if>
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.month)">
+            and date_format(c.occurred_date, '%Y-%m') = #{query.month}
+        </if>
+        <if test="query.onlyMine != null and query.onlyMine">
+            and d.pay_status = 0 and c.status = 1
+        </if>
+        order by case c.status
+                     when 0 then 0
+                     when 1 then 1
+                     when 2 then 2
+                     else 3
+                 end,
+                 c.occurred_date desc,
+                 c.create_time desc
+    </select>
+
+    <select id="selectSharedCostDetail" resultType="cloud.ciky.business.model.vo.DmSharedCostDetailVO">
+        select c.id,
+               c.title,
+               c.total_amount as totalAmount,
+               c.initiator_student_id as initiatorStudentId,
+               us.real_name as initiatorName,
+               c.occurred_date as occurredDate,
+               c.due_time as dueTime,
+               c.status,
+               c.remark,
+               c.source_voucher_attach_id as sourceVoucherAttachId,
+               sa.name as sourceVoucherName,
+               sa.bucket as sourceVoucherBucket,
+               sa.path as sourceVoucherPath
+        from dm_shared_cost c
+                 left join user_student us on us.id = c.initiator_student_id and us.delflag = 0
+                 left join dm_system.sys_attach sa on sa.id = c.source_voucher_attach_id and sa.delflag = 0
+        where c.id = #{id}
+          and c.room_id = #{roomId}
+          and c.delflag = 0
+        limit 1
+    </select>
+
+    <select id="selectCurrentRoomMemberList" resultType="cloud.ciky.business.model.vo.DmSharedCostMemberVO">
+        select rs.student_id as studentId,
+               us.real_name as studentName
+        from room_student rs
+                 join user_student us on us.id = rs.student_id and us.delflag = 0
+        where rs.room_id = #{roomId}
+          and rs.is_current = 1
+        order by us.real_name
+    </select>
+
+    <select id="countCurrentRoomStudent" resultType="java.lang.Integer">
+        select count(1)
+        from room_student
+        where room_id = #{roomId}
+          and student_id = #{studentId}
+          and is_current = 1
+    </select>
+
+    <select id="countUnpaidDetail" resultType="java.lang.Integer">
+        select count(1)
+        from dm_shared_cost_detail
+        where cost_id = #{costId}
+          and delflag = 0
+          and pay_status = 0
+    </select>
 </mapper>

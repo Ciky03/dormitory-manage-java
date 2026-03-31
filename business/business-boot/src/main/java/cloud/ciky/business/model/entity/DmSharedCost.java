@@ -1,16 +1,14 @@
 package cloud.ciky.business.model.entity;
 
 import cloud.ciky.base.BaseEntity;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -65,7 +63,7 @@ public class DmSharedCost extends BaseEntity {
      * 状态 0-草稿 1-已发布 2-已完成 3-已取消
      */
     @TableField("status")
-    private Boolean status;
+    private Integer status;
 
     /**
      * 备注
@@ -78,5 +76,4 @@ public class DmSharedCost extends BaseEntity {
      */
     @TableField("source_voucher_attach_id")
     private String sourceVoucherAttachId;
-
 }

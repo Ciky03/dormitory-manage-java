@@ -28,6 +28,18 @@ public interface RoomStudentService extends IService<RoomStudent> {
 
     /**
      * <p>
+     * 获取当前学生所在宿舍(抛异常)
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/4/1 0:14
+     * @param studentId 学生id
+     * @return java.lang.String
+     */
+    String getSelectedRoomIdThrowExp(String studentId);
+
+    /**
+     * <p>
      * 保存学生宿舍信息
      * </p>
      *

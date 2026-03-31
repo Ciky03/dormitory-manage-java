@@ -28,7 +28,8 @@ public enum LogModuleEnum {
     TEACHER("教师"),
     DORMITORY_MANAGER("宿管"),
     CONVENTION("宿舍公约"),
-    TODO("宿舍待办");
+    TODO("宿舍待办"),
+    SHARED_COST("宿舍费用公摊");
 
     @JsonValue
     private final String moduleName;
