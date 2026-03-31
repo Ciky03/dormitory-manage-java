@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * Todo comment mapper.
+ * 宿舍待办评论 Mapper 接口
  *
  * @author ciky
  * @since 2026-03-26 16:12:54

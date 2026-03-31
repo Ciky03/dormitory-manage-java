@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Todo service implementation.
+ * 宿舍待办服务实现类
  *
  * @author ciky
  * @since 2026-03-26 16:12:54
@@ -43,20 +43,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> implements DmTodoService {
 
-    private static final String MSG_NOT_STUDENT = "\u5f53\u524d\u7528\u6237\u4e0d\u662f\u5b66\u751f";
-    private static final String MSG_ROOM_NOT_BOUND = "\u5f53\u524d\u767b\u5f55\u7528\u6237\u672a\u7ed1\u5b9a\u5bbf\u820d";
-    private static final String MSG_TODO_NOT_FOUND = "\u5f85\u529e\u4e0d\u5b58\u5728\u6216\u65e0\u6743\u8bbf\u95ee";
-    private static final String MSG_EDIT_FORBIDDEN = "\u4ec5\u521b\u5efa\u4eba\u6216\u8d1f\u8d23\u4eba\u53ef\u7f16\u8f91\u8be5\u5f85\u529e";
-    private static final String MSG_EDIT_STATUS_FORBIDDEN = "\u5df2\u5b8c\u6210\u6216\u5df2\u53d6\u6d88\u5f85\u529e\u4e0d\u5141\u8bb8\u7f16\u8f91";
-    private static final String MSG_DELETE_FORBIDDEN = "\u4ec5\u521b\u5efa\u4eba\u6216\u8d1f\u8d23\u4eba\u53ef\u5220\u9664\u8be5\u5f85\u529e";
-    private static final String MSG_DELETE_STATUS_FORBIDDEN = "\u5df2\u5b8c\u6210\u6216\u5df2\u53d6\u6d88\u5f85\u529e\u4e0d\u5141\u8bb8\u5220\u9664";
-    private static final String MSG_START_STATUS_FORBIDDEN = "\u4ec5\u5f85\u5904\u7406\u72b6\u6001\u53ef\u5f00\u59cb\u5904\u7406";
-    private static final String MSG_COMPLETE_FORBIDDEN = "\u4ec5\u521b\u5efa\u4eba\u6216\u8d1f\u8d23\u4eba\u53ef\u5b8c\u6210\u8be5\u5f85\u529e";
-    private static final String MSG_COMPLETE_STATUS_FORBIDDEN = "\u4ec5\u5f85\u5904\u7406\u6216\u8fdb\u884c\u4e2d\u72b6\u6001\u53ef\u5b8c\u6210";
-    private static final String MSG_CANCEL_REASON_REQUIRED = "\u53d6\u6d88\u539f\u56e0\u4e0d\u80fd\u4e3a\u7a7a";
-    private static final String MSG_CANCEL_FORBIDDEN = "\u4ec5\u521b\u5efa\u4eba\u6216\u8d1f\u8d23\u4eba\u53ef\u53d6\u6d88\u8be5\u5f85\u529e";
-    private static final String MSG_CANCEL_STATUS_FORBIDDEN = "\u4ec5\u5f85\u5904\u7406\u6216\u8fdb\u884c\u4e2d\u72b6\u6001\u53ef\u53d6\u6d88";
-    private static final String MSG_ASSIGNEE_INVALID = "\u8d1f\u8d23\u4eba\u5fc5\u987b\u662f\u5f53\u524d\u5bbf\u820d\u6210\u5458";
 
     private final RoomStudentService roomStudentService;
     private final DmTodoCommentService dmTodoCommentService;
@@ -98,11 +84,11 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public DmTodoDetailVO getTodoDetail(String id) {
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         String roomId = requireCurrentRoomId();
         DmTodoDetailVO detailVO = this.baseMapper.selectTodoDetail(id, roomId);
         if (detailVO == null) {
-            throw new BusinessException(MSG_TODO_NOT_FOUND);
+            throw new BusinessException("待办不存在或无权访问");
         }
         fillDetailLabels(detailVO);
         detailVO.setCanEdit(canEdit(detailVO, studentId));
@@ -116,7 +102,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public boolean saveTodo(DmTodoForm form) {
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         String roomId = requireCurrentRoomId();
         String assigneeStudentId = normalizeNullableString(form.getAssigneeStudentId());
         validateAssignee(roomId, assigneeStudentId);
@@ -124,10 +110,11 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
         if (CharSequenceUtil.isNotBlank(form.getId())) {
             DmTodo current = requireCurrentRoomTodo(form.getId(), roomId);
             if (!isOwner(current.getCreatorStudentId(), current.getAssigneeStudentId(), studentId)) {
-                throw new BusinessException(MSG_EDIT_FORBIDDEN);
+                throw new BusinessException("仅创建人或负责人可编辑该待办");
             }
-            if (Objects.equals(current.getStatus(), 2) || Objects.equals(current.getStatus(), 3)) {
-                throw new BusinessException(MSG_EDIT_STATUS_FORBIDDEN);
+            if (Objects.equals(current.getStatus(), DmTodoStatusEnum.COMPLETED.getValue())
+                    || Objects.equals(current.getStatus(), DmTodoStatusEnum.CANCELED.getValue())) {
+                throw new BusinessException("已完成或已取消待办不允许编辑");
             }
             return this.lambdaUpdate()
                     .eq(DmTodo::getId, current.getId())
@@ -148,7 +135,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
         entity.setTitle(form.getTitle());
         entity.setContent(form.getContent());
         entity.setPriority(form.getPriority());
-        entity.setStatus(0);
+        entity.setStatus(DmTodoStatusEnum.PENDING.getValue());
         entity.setAssigneeStudentId(assigneeStudentId);
         entity.setDueTime(form.getDueTime());
         entity.setCreateBy(SecurityUtils.getUserId());
@@ -158,13 +145,14 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public boolean deleteTodo(String id) {
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
         if (!isOwner(current.getCreatorStudentId(), current.getAssigneeStudentId(), studentId)) {
-            throw new BusinessException(MSG_DELETE_FORBIDDEN);
+            throw new BusinessException("仅创建人或负责人可删除该待办");
         }
-        if (Objects.equals(current.getStatus(), 2) || Objects.equals(current.getStatus(), 3)) {
-            throw new BusinessException(MSG_DELETE_STATUS_FORBIDDEN);
+        if (Objects.equals(current.getStatus(), DmTodoStatusEnum.COMPLETED.getValue())
+                || Objects.equals(current.getStatus(), DmTodoStatusEnum.CANCELED.getValue())) {
+            throw new BusinessException("已完成或已取消待办不允许删除");
         }
         current.setDelflag(true);
         current.setUpdateBy(SecurityUtils.getUserId());
@@ -173,10 +161,10 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public boolean startTodo(String id) {
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
-        if (!Objects.equals(current.getStatus(), 0)) {
-            throw new BusinessException(MSG_START_STATUS_FORBIDDEN);
+        if (!Objects.equals(current.getStatus(), DmTodoStatusEnum.PENDING.getValue())) {
+            throw new BusinessException("仅待处理状态可开始处理");
         }
         current.setStatus(1);
         current.setStartTime(LocalDateTime.now());
@@ -189,15 +177,16 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public boolean completeTodo(String id) {
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
         if (!canOperate(current, studentId)) {
-            throw new BusinessException(MSG_COMPLETE_FORBIDDEN);
+            throw new BusinessException("仅创建人或负责人可完成该待办");
         }
-        if (!Objects.equals(current.getStatus(), 0) && !Objects.equals(current.getStatus(), 1)) {
-            throw new BusinessException(MSG_COMPLETE_STATUS_FORBIDDEN);
+        if (!Objects.equals(current.getStatus(), DmTodoStatusEnum.PENDING.getValue())
+                && !Objects.equals(current.getStatus(), DmTodoStatusEnum.PROCESSING.getValue())) {
+            throw new BusinessException("仅待处理或进行中状态可完成");
         }
-        current.setStatus(2);
+        current.setStatus(DmTodoStatusEnum.COMPLETED.getValue());
         current.setCompletedTime(LocalDateTime.now());
         current.setCompletedBy(studentId);
         current.setUpdateBy(SecurityUtils.getUserId());
@@ -208,17 +197,18 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     public boolean cancelTodo(String id, String cancelReason) {
         String reason = normalizeNullableString(cancelReason);
         if (CharSequenceUtil.isBlank(reason)) {
-            throw new BusinessException(MSG_CANCEL_REASON_REQUIRED);
+            throw new BusinessException("取消原因不能为空");
         }
-        String studentId = requireStudentId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
         if (!canOperate(current, studentId)) {
-            throw new BusinessException(MSG_CANCEL_FORBIDDEN);
+            throw new BusinessException("仅创建人或负责人可取消该待办");
         }
-        if (!Objects.equals(current.getStatus(), 0) && !Objects.equals(current.getStatus(), 1)) {
-            throw new BusinessException(MSG_CANCEL_STATUS_FORBIDDEN);
+        if (!Objects.equals(current.getStatus(), DmTodoStatusEnum.PENDING.getValue())
+                && !Objects.equals(current.getStatus(), DmTodoStatusEnum.PROCESSING.getValue())) {
+            throw new BusinessException("仅待处理或进行中状态可取消");
         }
-        current.setStatus(3);
+        current.setStatus(DmTodoStatusEnum.CANCELED.getValue());
         current.setCancelReason(reason);
         current.setUpdateBy(SecurityUtils.getUserId());
         return this.updateById(current);
@@ -229,34 +219,27 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
         return this.baseMapper.listAssigneeOptions(requireCurrentRoomId());
     }
 
-    private String requireStudentId() {
-        if (!Objects.equals(SecurityUtils.getUserType(), UserTypeEnum.STUDENT.getValue())) {
-            throw new BusinessException(MSG_NOT_STUDENT);
-        }
-        return UserInfoUtil.getCurrentStudentId();
-    }
-
     private String requireCurrentRoomId() {
-        String roomId = roomStudentService.getSelectedRoomId(requireStudentId());
+        String roomId = roomStudentService.getSelectedRoomId(UserInfoUtil.getCurrentStudentId());
         if (CharSequenceUtil.isBlank(roomId)) {
-            throw new BusinessException(MSG_ROOM_NOT_BOUND);
+            throw new BusinessException("当前登录用户未绑定宿舍");
         }
         return roomId;
     }
 
     private boolean canEdit(DmTodoDetailVO detailVO, String studentId) {
         return isOwner(detailVO.getCreatorStudentId(), detailVO.getAssigneeStudentId(), studentId)
-                && !Objects.equals(detailVO.getStatus(), 2)
-                && !Objects.equals(detailVO.getStatus(), 3);
+                && !Objects.equals(detailVO.getStatus(), DmTodoStatusEnum.COMPLETED.getValue())
+                && !Objects.equals(detailVO.getStatus(), DmTodoStatusEnum.CANCELED.getValue());
     }
 
     private boolean canStart(DmTodoDetailVO detailVO) {
-        return Objects.equals(detailVO.getStatus(), 0);
+        return Objects.equals(detailVO.getStatus(), DmTodoStatusEnum.PENDING.getValue());
     }
 
     private boolean canOperate(DmTodoDetailVO detailVO, String studentId) {
         return isOwner(detailVO.getCreatorStudentId(), detailVO.getAssigneeStudentId(), studentId)
-                && (Objects.equals(detailVO.getStatus(), 0) || Objects.equals(detailVO.getStatus(), 1));
+                && (Objects.equals(detailVO.getStatus(), DmTodoStatusEnum.PENDING.getValue()) || Objects.equals(detailVO.getStatus(), DmTodoStatusEnum.PROCESSING.getValue()));
     }
 
     private void validateAssignee(String roomId, String assigneeStudentId) {
@@ -265,7 +248,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
         }
         Integer count = this.baseMapper.countCurrentRoomStudent(roomId, assigneeStudentId);
         if (count == null || count == 0) {
-            throw new BusinessException(MSG_ASSIGNEE_INVALID);
+            throw new BusinessException("负责人必须是当前宿舍成员");
         }
     }
 
@@ -276,7 +259,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
                 .eq(DmTodo::getDelflag, false)
                 .last("limit 1"));
         if (entity == null) {
-            throw new BusinessException(MSG_TODO_NOT_FOUND);
+            throw new BusinessException("待办不存在或无权访问");
         }
         return entity;
     }

@@ -32,7 +32,7 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      *
      * @author ciky
      * @since 2026/3/26 17:42
-     * @param roomId 宿舍id
+     * @param roomId 宿舍编号
      * @param weekStart 周起始时间
      * @param weekEnd 周结束时间
      * @return cloud.ciky.business.model.vo.DmTodoStatVO
@@ -50,7 +50,7 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      * @since 2026/3/26 17:42
      * @param page 分页对象
      * @param query 查询对象
-     * @param roomId 宿舍id
+     * @param roomId 宿舍编号
      * @param now 当前时间
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DmTodoPageVO>
      */
@@ -67,7 +67,7 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      * @author ciky
      * @since 2026/3/26 17:42
      * @param id 主键
-     * @param roomId 宿舍id
+     * @param roomId 宿舍编号
      * @return cloud.ciky.business.model.vo.DmTodoDetailVO
      */
     DmTodoDetailVO selectTodoDetail(@Param("id") String id, @Param("roomId") String roomId);
@@ -79,7 +79,7 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      *
      * @author ciky
      * @since 2026/3/26 17:42
-     * @param roomId 宿舍id
+     * @param roomId 宿舍编号
      * @return java.util.List<cloud.ciky.base.model.Option<java.lang.String>>
      */
     List<Option<String>> listAssigneeOptions(@Param("roomId") String roomId);
@@ -91,8 +91,8 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      *
      * @author ciky
      * @since 2026/3/26 17:42
-     * @param roomId 宿舍id
-     * @param studentId 学生id
+     * @param roomId 宿舍编号
+     * @param studentId 学生编号
      * @return java.lang.Integer
      */
     Integer countCurrentRoomStudent(@Param("roomId") String roomId,

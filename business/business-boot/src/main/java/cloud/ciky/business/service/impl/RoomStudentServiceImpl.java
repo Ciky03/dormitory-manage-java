@@ -1,10 +1,12 @@
 package cloud.ciky.business.service.impl;
 
+import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.business.model.entity.RoomStudent;
 import cloud.ciky.business.model.form.RoomStudentForm;
 import cloud.ciky.business.mapper.RoomStudentMapper;
 import cloud.ciky.business.service.RoomStudentService;
 import cloud.ciky.security.util.SecurityUtils;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

@@ -10,37 +10,37 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * Todo save form.
+ * 宿舍待办表单对象
  *
  * @author ciky
  * @since 2026-03-26 17:36
  */
 @Data
-@Schema(description = "Dorm todo form")
+@Schema(description = "宿舍待办表单对象")
 public class DmTodoForm {
 
-    @Schema(description = "Todo id")
+    @Schema(description = "待办编号")
     private String id;
 
-    @Schema(description = "Todo title")
-    @NotBlank(message = "\u6807\u9898\u4e0d\u80fd\u4e3a\u7a7a")
+    @Schema(description = "待办标题")
+    @NotBlank(message = "标题不能为空")
     private String title;
 
-    @Schema(description = "Todo content")
-    @NotBlank(message = "\u5185\u5bb9\u4e0d\u80fd\u4e3a\u7a7a")
+    @Schema(description = "待办内容")
+    @NotBlank(message = "内容不能为空")
     private String content;
 
-    @Schema(description = "Priority")
-    @NotNull(message = "\u4f18\u5148\u7ea7\u4e0d\u80fd\u4e3a\u7a7a")
+    @Schema(description = "优先级")
+    @NotNull(message = "优先级不能为空")
     private Integer priority;
 
-    @Schema(description = "Assignee student id")
+    @Schema(description = "负责人学生编号")
     private String assigneeStudentId;
 
-    @Schema(description = "Due time")
+    @Schema(description = "截止时间")
     @JsonFormat(pattern = DateFormatConstants.FORMAT)
     private LocalDateTime dueTime;
 
-    @Schema(description = "Cancel reason")
+    @Schema(description = "取消原因")
     private String cancelReason;
 }

@@ -40,13 +40,13 @@ public class DmTodo extends BaseEntity {
     private String content;
 
     /**
-     * 优先级 1-低 2-中 3-高
+     * 优先级(1-低 2-中 3-高)
      */
     @TableField("priority")
     private Integer priority;
 
     /**
-     * 状态 0-待处理 1-进行中 2-已完成 3-已取消
+     * 状态(0-待处理 1-进行中 2-已完成 3-已取消)
      */
     @TableField("status")
     private Integer status;

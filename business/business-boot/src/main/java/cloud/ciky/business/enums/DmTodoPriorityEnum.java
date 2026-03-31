@@ -4,16 +4,16 @@ import cloud.ciky.base.IBaseEnum;
 import lombok.Getter;
 
 /**
- * Todo priority enum.
+ * 宿舍待办优先级枚举
  *
  * @author ciky
  * @since 2026/3/26 17:31
  */
 public enum DmTodoPriorityEnum implements IBaseEnum<Integer> {
 
-    LOW(1, "\u4f4e"),
-    MEDIUM(2, "\u4e2d"),
-    HIGH(3, "\u9ad8");
+    LOW(1, "低"),
+    MEDIUM(2, "中"),
+    HIGH(3, "高");
 
     @Getter
     private final Integer value;

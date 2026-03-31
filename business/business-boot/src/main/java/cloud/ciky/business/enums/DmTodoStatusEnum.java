@@ -4,17 +4,17 @@ import cloud.ciky.base.IBaseEnum;
 import lombok.Getter;
 
 /**
- * Todo status enum.
+ * 宿舍待办状态枚举
  *
  * @author ciky
  * @since 2026/3/26 17:31
  */
 public enum DmTodoStatusEnum implements IBaseEnum<Integer> {
 
-    PENDING(0, "\u5f85\u5904\u7406"),
-    PROCESSING(1, "\u8fdb\u884c\u4e2d"),
-    COMPLETED(2, "\u5df2\u5b8c\u6210"),
-    CANCELED(3, "\u5df2\u53d6\u6d88");
+    PENDING(0, "待处理"),
+    PROCESSING(1, "进行中"),
+    COMPLETED(2, "已完成"),
+    CANCELED(3, "已取消");
 
     @Getter
     private final Integer value;

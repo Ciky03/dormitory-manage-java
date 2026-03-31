@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Todo comment service implementation.
+ * 宿舍待办评论服务实现类
  *
  * @author ciky
  * @since 2026-03-26 16:12:54
@@ -31,11 +31,6 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class DmTodoCommentServiceImpl extends ServiceImpl<DmTodoCommentMapper, DmTodoComment> implements DmTodoCommentService {
-
-    private static final String MSG_NOT_STUDENT = "\u5f53\u524d\u7528\u6237\u4e0d\u662f\u5b66\u751f";
-    private static final String MSG_ROOM_NOT_BOUND = "\u5f53\u524d\u767b\u5f55\u7528\u6237\u672a\u7ed1\u5b9a\u5bbf\u820d";
-    private static final String MSG_TODO_NOT_FOUND = "\u5f85\u529e\u4e0d\u5b58\u5728\u6216\u65e0\u6743\u8bbf\u95ee";
-    private static final String MSG_DELETED_TODO_COMMENT_FORBIDDEN = "\u5df2\u5220\u9664\u4efb\u52a1\u7981\u6b62\u8bc4\u8bba";
 
     private final RoomStudentService roomStudentService;
     private final DmTodoMapper dmTodoMapper;
@@ -51,7 +46,7 @@ public class DmTodoCommentServiceImpl extends ServiceImpl<DmTodoCommentMapper, D
     public boolean addComment(DmTodoCommentForm form) {
         DmTodo todo = requireCurrentRoomTodo(form.getTodoId(), true);
         if (Boolean.TRUE.equals(todo.getDelflag())) {
-            throw new BusinessException(MSG_DELETED_TODO_COMMENT_FORBIDDEN);
+            throw new BusinessException("已删除任务禁止评论");
         }
         DmTodoComment entity = new DmTodoComment();
         entity.setTodoId(form.getTodoId());
@@ -73,14 +68,14 @@ public class DmTodoCommentServiceImpl extends ServiceImpl<DmTodoCommentMapper, D
         wrapper.last("limit 1");
         DmTodo todo = dmTodoMapper.selectOne(wrapper);
         if (todo == null) {
-            throw new BusinessException(MSG_TODO_NOT_FOUND);
+            throw new BusinessException("待办不存在或无权访问");
         }
         return todo;
     }
 
     private String requireStudentId() {
         if (!Objects.equals(SecurityUtils.getUserType(), UserTypeEnum.STUDENT.getValue())) {
-            throw new BusinessException(MSG_NOT_STUDENT);
+            throw new BusinessException("当前用户不是学生");
         }
         return UserInfoUtil.getCurrentStudentId();
     }
@@ -88,7 +83,7 @@ public class DmTodoCommentServiceImpl extends ServiceImpl<DmTodoCommentMapper, D
     private String requireCurrentRoomId() {
         String roomId = roomStudentService.getSelectedRoomId(requireStudentId());
         if (CharSequenceUtil.isBlank(roomId)) {
-            throw new BusinessException(MSG_ROOM_NOT_BOUND);
+            throw new BusinessException("当前登录用户未绑定宿舍");
         }
         return roomId;
     }

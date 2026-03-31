@@ -9,81 +9,81 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Todo detail view object.
+ * 宿舍待办详情视图对象
  *
  * @author ciky
  * @since 2026-03-26 17:36
  */
 @Data
-@Schema(description = "Dorm todo detail view")
+@Schema(description = "宿舍待办详情视图对象")
 public class DmTodoDetailVO {
 
-    @Schema(description = "Todo id")
+    @Schema(description = "待办编号")
     private String id;
 
-    @Schema(description = "Title")
+    @Schema(description = "标题")
     private String title;
 
-    @Schema(description = "Content")
+    @Schema(description = "内容")
     private String content;
 
-    @Schema(description = "Priority")
+    @Schema(description = "优先级")
     private Integer priority;
 
-    @Schema(description = "Priority label")
+    @Schema(description = "优先级文案")
     private String priorityLabel;
 
-    @Schema(description = "Status")
+    @Schema(description = "状态")
     private Integer status;
 
-    @Schema(description = "Status label")
+    @Schema(description = "状态文案")
     private String statusLabel;
 
-    @Schema(description = "Assignee student id")
+    @Schema(description = "负责人学生编号")
     private String assigneeStudentId;
 
-    @Schema(description = "Assignee name")
+    @Schema(description = "负责人姓名")
     private String assigneeName;
 
-    @Schema(description = "Creator student id")
+    @Schema(description = "创建人学生编号")
     private String creatorStudentId;
 
-    @Schema(description = "Creator name")
+    @Schema(description = "创建人姓名")
     private String creatorName;
 
-    @Schema(description = "Due time")
+    @Schema(description = "截止时间")
     @JsonFormat(pattern = DateFormatConstants.FORMAT)
     private LocalDateTime dueTime;
 
-    @Schema(description = "Start time")
+    @Schema(description = "开始时间")
     @JsonFormat(pattern = DateFormatConstants.FORMAT)
     private LocalDateTime startTime;
 
-    @Schema(description = "Completed time")
+    @Schema(description = "完成时间")
     @JsonFormat(pattern = DateFormatConstants.FORMAT)
     private LocalDateTime completedTime;
 
-    @Schema(description = "Completed by")
+    @Schema(description = "完成人编号")
     private String completedBy;
 
-    @Schema(description = "Completed by name")
+    @Schema(description = "完成人姓名")
     private String completedByName;
 
-    @Schema(description = "Cancel reason")
+    @Schema(description = "取消原因")
     private String cancelReason;
 
-    @Schema(description = "Can edit")
+    @Schema(description = "是否可编辑")
     private Boolean canEdit;
 
-    @Schema(description = "Can start")
+    @Schema(description = "是否可开始")
     private Boolean canStart;
 
-    @Schema(description = "Can complete")
+    @Schema(description = "是否可完成")
     private Boolean canComplete;
 
-    @Schema(description = "Can cancel")
+    @Schema(description = "是否可取消")
     private Boolean canCancel;
 
-    @Schema(description = "Comment list")
+    @Schema(description = "评论列表")
     private List<DmTodoCommentVO> commentList;
 }

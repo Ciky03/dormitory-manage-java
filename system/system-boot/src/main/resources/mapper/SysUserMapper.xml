@@ -74,6 +74,8 @@
     <select id="getUserInfo" resultType="cloud.ciky.system.model.vo.UserInfoVO">
         select
             su.id,
+            su.user_type,
+            su.business_user_id,
             su.real_name,
             su.avatar_attach_id,
             su.wx_mp_openId

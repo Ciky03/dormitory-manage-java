@@ -24,6 +24,12 @@ public class UserInfoVO {
     @Schema(description = "用户姓名")
     private String realName;
 
+    @Schema(description = "用户类型(0-其他 1-学生 2-教师 3-宿管)")
+    private Integer userType;
+
+    @Schema(description = "业务用户id")
+    private String businessUserId;
+
     @JsonIgnore
     @Schema(description = "头像附件id")
     private String avatarAttachId;

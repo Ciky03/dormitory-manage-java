@@ -6,22 +6,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Todo page query.
+ * 宿舍待办分页查询对象
  *
  * @author ciky
  * @since 2026-03-26 17:36
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "Dorm todo page query")
+@Schema(description = "宿舍待办分页查询对象")
 public class DmTodoPageQuery extends BaseQuery {
 
-    @Schema(description = "Priority")
+    @Schema(description = "优先级")
     private Integer priority;
 
-    @Schema(description = "Assignee student id")
+    @Schema(description = "负责人学生编号")
     private String assigneeStudentId;
 
-    @Schema(description = "Due type")
+    @Schema(description = "到期类型")
     private Integer dueType;
 }
