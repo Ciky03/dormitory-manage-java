@@ -65,16 +65,9 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public Page<DmTodoPageVO> listTodo(DmTodoPageQuery query) {
-        String roomId = requireCurrentRoomId();
-        Page<DmTodoPageVO> page = this.baseMapper.selectTodoPage(
-                new Page<>(query.getPageNum(), query.getPageSize()),
-                query,
-                roomId,
-                LocalDateTime.now()
-        );
-        if (page == null) {
-            return new Page<>(query.getPageNum(), query.getPageSize());
-        }
+        query.setRoomId(roomStudentService.getSelectedRoomIdThrowExp(UserInfoUtil.getCurrentStudentId()));
+        query.setNow(LocalDateTime.now());
+        Page<DmTodoPageVO> page = this.baseMapper.selectTodoPage(new Page<>(query.getPageNum(), query.getPageSize()), query);
         if (page.getRecords() != null) {
             page.getRecords().forEach(this::fillPageLabels);
         }
@@ -84,12 +77,13 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     @Override
     public DmTodoDetailVO getTodoDetail(String id) {
         String studentId = UserInfoUtil.getCurrentStudentId();
-        String roomId = requireCurrentRoomId();
+        String roomId = roomStudentService.getSelectedRoomIdThrowExp(studentId);
         DmTodoDetailVO detailVO = this.baseMapper.selectTodoDetail(id, roomId);
         if (detailVO == null) {
             throw new BusinessException("待办不存在或无权访问");
         }
-        fillDetailLabels(detailVO);
+        detailVO.setPriorityLabel(IBaseEnum.getLabelByValue(detailVO.getPriority(), DmTodoPriorityEnum.class));
+        detailVO.setStatusLabel(IBaseEnum.getLabelByValue(detailVO.getStatus(), DmTodoStatusEnum.class));
         detailVO.setCanEdit(canEdit(detailVO, studentId));
         detailVO.setCanStart(canStart(detailVO));
         detailVO.setCanComplete(canOperate(detailVO, studentId));
@@ -102,12 +96,15 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     @Override
     public boolean saveTodo(DmTodoForm form) {
         String studentId = UserInfoUtil.getCurrentStudentId();
-        String roomId = requireCurrentRoomId();
+        String roomId = roomStudentService.getSelectedRoomIdThrowExp(studentId);
         String assigneeStudentId = normalizeNullableString(form.getAssigneeStudentId());
         validateAssignee(roomId, assigneeStudentId);
 
-        if (CharSequenceUtil.isNotBlank(form.getId())) {
-            DmTodo current = requireCurrentRoomTodo(form.getId(), roomId);
+        String id = form.getId();
+        DmTodo entity = new DmTodo();
+        if (CharSequenceUtil.isNotBlank(id)) {
+            //编辑
+            DmTodo current = requireCurrentRoomTodo(id, roomId);
             if (!isOwner(current.getCreatorStudentId(), current.getAssigneeStudentId(), studentId)) {
                 throw new BusinessException("仅创建人或负责人可编辑该待办");
             }
@@ -115,37 +112,28 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
                     || Objects.equals(current.getStatus(), DmTodoStatusEnum.CANCELED.getValue())) {
                 throw new BusinessException("已完成或已取消待办不允许编辑");
             }
-            return this.lambdaUpdate()
-                    .eq(DmTodo::getId, current.getId())
-                    .eq(DmTodo::getRoomId, roomId)
-                    .eq(DmTodo::getDelflag, false)
-                    .set(DmTodo::getTitle, form.getTitle())
-                    .set(DmTodo::getContent, form.getContent())
-                    .set(DmTodo::getPriority, form.getPriority())
-                    .set(DmTodo::getAssigneeStudentId, assigneeStudentId)
-                    .set(DmTodo::getDueTime, form.getDueTime())
-                    .set(DmTodo::getUpdateBy, SecurityUtils.getUserId())
-                    .update();
+            entity.setId(id);
+            entity.setUpdateBy(SecurityUtils.getUserId());
+            entity.setCreatorStudentId(current.getCreatorStudentId());
+        } else {
+            //新增
+            entity.setCreateBy(SecurityUtils.getUserId());
+            entity.setCreatorStudentId(studentId);
         }
-
-        DmTodo entity = new DmTodo();
         entity.setRoomId(roomId);
-        entity.setCreatorStudentId(studentId);
         entity.setTitle(form.getTitle());
         entity.setContent(form.getContent());
         entity.setPriority(form.getPriority());
         entity.setStatus(DmTodoStatusEnum.PENDING.getValue());
         entity.setAssigneeStudentId(assigneeStudentId);
         entity.setDueTime(form.getDueTime());
-        entity.setCreateBy(SecurityUtils.getUserId());
-        entity.setDelflag(false);
-        return this.save(entity);
+        return this.saveOrUpdate(entity);
     }
 
     @Override
     public boolean deleteTodo(String id) {
         String studentId = UserInfoUtil.getCurrentStudentId();
-        DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
+        DmTodo current = requireCurrentRoomTodo(id, roomStudentService.getSelectedRoomIdThrowExp(studentId));
         if (!isOwner(current.getCreatorStudentId(), current.getAssigneeStudentId(), studentId)) {
             throw new BusinessException("仅创建人或负责人可删除该待办");
         }
@@ -161,7 +149,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     @Override
     public boolean startTodo(String id) {
         String studentId = UserInfoUtil.getCurrentStudentId();
-        DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
+        DmTodo current = requireCurrentRoomTodo(id, roomStudentService.getSelectedRoomIdThrowExp(studentId));
         if (!Objects.equals(current.getStatus(), DmTodoStatusEnum.PENDING.getValue())) {
             throw new BusinessException("仅待处理状态可开始处理");
         }
@@ -177,7 +165,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     @Override
     public boolean completeTodo(String id) {
         String studentId = UserInfoUtil.getCurrentStudentId();
-        DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
+        DmTodo current = requireCurrentRoomTodo(id, roomStudentService.getSelectedRoomIdThrowExp(studentId));
         if (!canOperate(current, studentId)) {
             throw new BusinessException("仅创建人或负责人可完成该待办");
         }
@@ -199,7 +187,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
             throw new BusinessException("取消原因不能为空");
         }
         String studentId = UserInfoUtil.getCurrentStudentId();
-        DmTodo current = requireCurrentRoomTodo(id, requireCurrentRoomId());
+        DmTodo current = requireCurrentRoomTodo(id, roomStudentService.getSelectedRoomIdThrowExp(studentId));
         if (!canOperate(current, studentId)) {
             throw new BusinessException("仅创建人或负责人可取消该待办");
         }
@@ -215,15 +203,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public List<Option<String>> listAssigneeOptions() {
-        return this.baseMapper.listAssigneeOptions(requireCurrentRoomId());
-    }
-
-    private String requireCurrentRoomId() {
-        String roomId = roomStudentService.getSelectedRoomId(UserInfoUtil.getCurrentStudentId());
-        if (CharSequenceUtil.isBlank(roomId)) {
-            throw new BusinessException("当前学生暂未分配宿舍");
-        }
-        return roomId;
+        return this.baseMapper.listAssigneeOptions(roomStudentService.getSelectedRoomIdThrowExp(UserInfoUtil.getCurrentStudentId()));
     }
 
     private boolean canEdit(DmTodoDetailVO detailVO, String studentId) {
@@ -272,10 +252,6 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
         pageVO.setStatusLabel(IBaseEnum.getLabelByValue(pageVO.getStatus(), DmTodoStatusEnum.class));
     }
 
-    private void fillDetailLabels(DmTodoDetailVO detailVO) {
-        detailVO.setPriorityLabel(IBaseEnum.getLabelByValue(detailVO.getPriority(), DmTodoPriorityEnum.class));
-        detailVO.setStatusLabel(IBaseEnum.getLabelByValue(detailVO.getStatus(), DmTodoStatusEnum.class));
-    }
 
     private boolean isOwner(String creatorStudentId, String assigneeStudentId, String studentId) {
         return Objects.equals(creatorStudentId, studentId) || Objects.equals(assigneeStudentId, studentId);

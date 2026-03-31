@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+
 /**
  * 宿舍待办分页查询对象
  *
@@ -24,4 +26,10 @@ public class DmTodoPageQuery extends BaseQuery {
 
     @Schema(description = "到期类型")
     private Integer dueType;
+
+    @Schema(description = "宿舍id")
+    private String roomId;
+
+    @Schema(description = "当前时间")
+    private LocalDateTime now;
 }

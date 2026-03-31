@@ -65,7 +65,7 @@
                t.due_time as dueTime,
                t.create_time as createTime,
                case
-                   when t.due_time is not null and t.status in (0, 1) and t.due_time <![CDATA[ < ]]> #{now}
+                   when t.due_time is not null and t.status in (0, 1) and t.due_time <![CDATA[ < ]]> #{query.now}
                        then 1
                    else 0
                    end as overdue
@@ -73,7 +73,7 @@
                  left join user_student ua on ua.id = t.assignee_student_id and ua.delflag = 0
                  left join user_student uc on uc.id = t.creator_student_id and uc.delflag = 0
         where t.delflag = 0
-          and t.room_id = #{roomId}
+          and t.room_id = #{query.roomId}
         <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(query.keywords)">
             and (t.title like concat('%', #{query.keywords}, '%')
             or t.content like concat('%', #{query.keywords}, '%'))
@@ -93,13 +93,13 @@
         </if>
         <if test="query.dueType != null and query.dueType == 2">
             and t.due_time is not null
-            and t.due_time <![CDATA[ >= ]]> #{now}
-            and t.due_time <![CDATA[ < ]]> date_add(#{now}, interval 3 day)
+            and t.due_time <![CDATA[ >= ]]> #{query.now}
+            and t.due_time <![CDATA[ < ]]> date_add(#{query.now}, interval 3 day)
         </if>
         <if test="query.dueType != null and query.dueType == 3">
             and t.due_time is not null
             and t.status in (0, 1)
-            and t.due_time <![CDATA[ < ]]> #{now}
+            and t.due_time <![CDATA[ < ]]> #{query.now}
         </if>
         order by case when t.status in (0, 1) then 0 else 1 end,
                  t.priority desc,

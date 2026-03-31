@@ -91,7 +91,7 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean publishConvention(String id) {
-        String roomId = getCurrentRoomId();
+        String roomId =roomStudentService.getSelectedRoomIdThrowExp(UserInfoUtil.getCurrentStudentId());
         DmConvention entity = getConvention(id, roomId);
         if (entity.getStatus() == null || entity.getStatus() != ConventionStatusEnum.DRAFT.getValue()) {
             throw new BusinessException("仅草稿状态可发布");
@@ -129,7 +129,7 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
 
     @Override
     public DmConvention getCurrentRoomConvention(String id) {
-        return getConvention(id, getCurrentRoomId());
+        return getConvention(id, roomStudentService.getSelectedRoomIdThrowExp(UserInfoUtil.getCurrentStudentId()));
     }
 
     /**
@@ -145,17 +145,6 @@ public class DmConventionServiceImpl extends ServiceImpl<DmConventionMapper, DmC
             throw new BusinessException("公约不存在或无访问权限");
         }
         return entity;
-    }
-
-    /**
-     * 获取当前宿舍id
-     */
-    private String getCurrentRoomId() {
-        String roomId = roomStudentService.getSelectedRoomId(UserInfoUtil.getCurrentStudentId());
-        if (CharSequenceUtil.isBlank(roomId)) {
-            throw new BusinessException("当前登录用户未绑定宿舍");
-        }
-        return roomId;
     }
 
 }

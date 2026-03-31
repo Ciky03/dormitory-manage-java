@@ -50,14 +50,9 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      * @since 2026/3/26 17:42
      * @param page 分页对象
      * @param query 查询对象
-     * @param roomId 宿舍编号
-     * @param now 当前时间
      * @return com.baomidou.mybatisplus.extension.plugins.pagination.Page<cloud.ciky.business.model.vo.DmTodoPageVO>
      */
-    Page<DmTodoPageVO> selectTodoPage(Page<DmTodoPageVO> page,
-                                      @Param("query") DmTodoPageQuery query,
-                                      @Param("roomId") String roomId,
-                                      @Param("now") LocalDateTime now);
+    Page<DmTodoPageVO> selectTodoPage(Page<DmTodoPageVO> page, @Param("query") DmTodoPageQuery query);
 
     /**
      * <p>
@@ -95,6 +90,5 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      * @param studentId 学生编号
      * @return java.lang.Integer
      */
-    Integer countCurrentRoomStudent(@Param("roomId") String roomId,
-                                    @Param("studentId") String studentId);
+    Integer countCurrentRoomStudent(@Param("roomId") String roomId, @Param("studentId") String studentId);
 }
