@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cloud.ciky.business.mapper.DmSharedCostMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cloud.ciky.business.model.entity.DmSharedCost">
+        <id column="id" property="id" />
+        <result column="room_id" property="roomId" />
+        <result column="title" property="title" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="initiator_student_id" property="initiatorStudentId" />
+        <result column="occurred_date" property="occurredDate" />
+        <result column="due_time" property="dueTime" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="source_voucher_attach_id" property="sourceVoucherAttachId" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="delflag" property="delflag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, room_id, title, total_amount, initiator_student_id, occurred_date, due_time, status, remark, source_voucher_attach_id, create_by, create_time, update_by, update_time, delflag
+    </sql>
+
+</mapper>
