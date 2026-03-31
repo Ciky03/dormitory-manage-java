@@ -28,7 +28,7 @@
     <!--查询当前宿舍公约-->
     <select id="selectConventionInfo" resultType="cloud.ciky.business.model.vo.DmConventionVO">
         select c.id,
-               c.room_id,
+               rs.room_id,
                concat(ifnull(b.room_num, ''), ifnull(r.room_num, '')) as roomName,
                c.version_no,
                c.title,
@@ -36,23 +36,24 @@
                c.status,
                u.real_name                                            as publishBy,
                c.publish_time,
-                u2.real_name                                           as updateBy,
-                coalesce(c.update_time, c.create_time)                 as updateTime
-        from dm_convention c
-                 join room_student rs on rs.room_id = c.room_id and rs.student_id = #{studentId} and rs.is_current = 1
-                 left join dormitory r on r.id = c.room_id and r.delflag = 0
-                      and r.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+               u2.real_name                                           as updateBy,
+               coalesce(c.update_time, c.create_time)                 as updateTime
+        from room_student rs
+                 left join dm_convention c on c.room_id = rs.room_id and c.delflag = 0
+                        <if test="conventionId != null">
+                            and c.id = #{conventionId}
+                        </if>
+                        <if test="conventionId == null">
+                            and c.is_current = 1
+                        </if>
+                 left join dormitory r on r.id = rs.room_id and r.delflag = 0
+            and r.parent_id != '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
                  left join dormitory b on b.id = r.parent_id and b.delflag = 0
-                      and b.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
+            and b.parent_id = '${@cloud.ciky.base.constant.SystemConstants@ROOT_NODE_ID}'
                  left join dm_system.sys_user u on u.id = c.publish_by and u.delflag = 0
                  left join dm_system.sys_user u2 on u2.id = coalesce(c.update_by, c.create_by) and u2.delflag = 0
-        where c.delflag = 0
-              <if test="conventionId != null">
-                  and c.id = #{conventionId}
-              </if>
-              <if test="conventionId == null">
-                  and c.is_current = 1
-              </if>
+        where rs.student_id = #{studentId}
+          and rs.is_current = 1
         order by c.version_no desc
         limit 1
     </select>

@@ -32,12 +32,12 @@ public interface DmTodoMapper extends BaseMapper<DmTodo> {
      *
      * @author ciky
      * @since 2026/3/26 17:42
-     * @param roomId 宿舍编号
+     * @param studentId 学生id
      * @param weekStart 周起始时间
      * @param weekEnd 周结束时间
      * @return cloud.ciky.business.model.vo.DmTodoStatVO
      */
-    DmTodoStatVO selectTodoStat(@Param("roomId") String roomId,
+    DmTodoStatVO selectTodoStat(@Param("studentId") String studentId,
                                 @Param("weekStart") LocalDateTime weekStart,
                                 @Param("weekEnd") LocalDateTime weekEnd);
 

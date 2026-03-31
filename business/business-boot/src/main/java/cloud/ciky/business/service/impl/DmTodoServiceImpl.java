@@ -20,6 +20,7 @@ import cloud.ciky.business.service.RoomStudentService;
 import cloud.ciky.business.utils.UserInfoUtil;
 import cloud.ciky.security.util.SecurityUtils;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -49,18 +50,16 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
 
     @Override
     public DmTodoStatVO getTodoStat() {
-        String roomId = requireCurrentRoomId();
+        String studentId = UserInfoUtil.getCurrentStudentId();
         LocalDateTime weekStart = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
         LocalDateTime weekEnd = weekStart.plusDays(7);
-        DmTodoStatVO statVO = this.baseMapper.selectTodoStat(roomId, weekStart, weekEnd);
-        if (statVO == null) {
-            statVO = new DmTodoStatVO();
-            statVO.setRoomId(roomId);
+        DmTodoStatVO statVO = this.baseMapper.selectTodoStat(studentId, weekStart, weekEnd);
+        if (ObjUtil.isNotNull(statVO)) {
+            statVO.setTotalCount(defaultZero(statVO.getTotalCount()));
+            statVO.setPendingCount(defaultZero(statVO.getPendingCount()));
+            statVO.setProcessingCount(defaultZero(statVO.getProcessingCount()));
+            statVO.setWeekCompletedCount(defaultZero(statVO.getWeekCompletedCount()));
         }
-        statVO.setTotalCount(defaultZero(statVO.getTotalCount()));
-        statVO.setPendingCount(defaultZero(statVO.getPendingCount()));
-        statVO.setProcessingCount(defaultZero(statVO.getProcessingCount()));
-        statVO.setWeekCompletedCount(defaultZero(statVO.getWeekCompletedCount()));
         return statVO;
     }
 
@@ -222,7 +221,7 @@ public class DmTodoServiceImpl extends ServiceImpl<DmTodoMapper, DmTodo> impleme
     private String requireCurrentRoomId() {
         String roomId = roomStudentService.getSelectedRoomId(UserInfoUtil.getCurrentStudentId());
         if (CharSequenceUtil.isBlank(roomId)) {
-            throw new BusinessException("当前登录用户未绑定宿舍");
+            throw new BusinessException("当前学生暂未分配宿舍");
         }
         return roomId;
     }

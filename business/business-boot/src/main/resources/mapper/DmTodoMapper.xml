@@ -43,11 +43,12 @@
                                     then 1
                                 else 0
                             end), 0) as weekCompletedCount
-        from dormitory r
+        from room_student rs
+                 left join dormitory r on r.id = rs.room_id and r.delflag = 0
                  left join dormitory b on b.id = r.parent_id and b.delflag = 0
                  left join dm_todo t on t.room_id = r.id and t.delflag = 0
-        where r.id = #{roomId}
-          and r.delflag = 0
+        where rs.student_id = #{studentId}
+          and rs.is_current = 1
         group by r.id, b.room_num, r.room_num
     </select>
 
