@@ -6,8 +6,12 @@ import cloud.ciky.business.mapper.UserStudentMapper;
 import cloud.ciky.business.model.entity.UserStudent;
 import cloud.ciky.business.model.form.UserStudentForm;
 import cloud.ciky.business.model.query.StudentPageQuery;
+import cloud.ciky.business.model.vo.RoomMemberVO;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import cloud.ciky.business.service.UserStudentService;
+import cloud.ciky.business.utils.UserInfoUtil;
+import cloud.ciky.file.model.dto.TempUrlDTO;
+import cloud.ciky.file.service.OssService;
 import cloud.ciky.security.util.SecurityUtils;
 import cloud.ciky.system.api.UserFeignClient;
 import cloud.ciky.base.enums.UserTypeEnum;
@@ -24,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <p>
@@ -39,6 +45,7 @@ import java.time.LocalDateTime;
 public class UserStudentServiceImpl extends ServiceImpl<UserStudentMapper, UserStudent> implements UserStudentService {
 
     private final UserFeignClient userFeignClient;
+    private final OssService ossService;
 
     @Override
     public Page<StudentPageVO> listStudent(StudentPageQuery query) {
@@ -48,6 +55,17 @@ public class UserStudentServiceImpl extends ServiceImpl<UserStudentMapper, UserS
     @Override
     public UserStudentForm getStudentForm(String id) {
         return this.baseMapper.selectStudentForm(id);
+    }
+
+    @Override
+    public List<RoomMemberVO> listCurrentRoomMember() {
+        String currentStudentId = UserInfoUtil.getCurrentStudentId();
+        List<RoomMemberVO> memberList = this.baseMapper.selectCurrentRoomMemberList(currentStudentId);
+        if (memberList == null || memberList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        memberList.forEach(member -> member.setAvatarUrl(buildAttachUrl(member.getAvatarBucket(), member.getAvatarPath())));
+        return memberList;
     }
 
     @Override
@@ -107,5 +125,12 @@ public class UserStudentServiceImpl extends ServiceImpl<UserStudentMapper, UserS
             saved = userFeignClient.addUser(userForm).getData();
         }
         return saved;
+    }
+
+    private String buildAttachUrl(String bucket, String path) {
+        if (CharSequenceUtil.isBlank(bucket) || CharSequenceUtil.isBlank(path)) {
+            return null;
+        }
+        return ossService.getTempUrl(new TempUrlDTO(bucket, path));
     }
 }

@@ -4,25 +4,43 @@ import cloud.ciky.base.BaseQuery;
 import cloud.ciky.base.enums.LogModuleEnum;
 import cloud.ciky.base.result.PageResult;
 import cloud.ciky.base.result.Result;
-import cloud.ciky.business.model.form.*;
+import cloud.ciky.business.model.form.ClassStudentForm;
+import cloud.ciky.business.model.form.RoomStudentForm;
+import cloud.ciky.business.model.form.UserDmForm;
+import cloud.ciky.business.model.form.UserStudentForm;
+import cloud.ciky.business.model.form.UserTeacherForm;
 import cloud.ciky.business.model.query.StudentPageQuery;
 import cloud.ciky.business.model.vo.DmPageVO;
+import cloud.ciky.business.model.vo.RoomMemberVO;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import cloud.ciky.business.model.vo.TeacherPageVO;
-import cloud.ciky.business.service.*;
+import cloud.ciky.business.service.ClassStudentService;
+import cloud.ciky.business.service.RoomStudentService;
+import cloud.ciky.business.service.UserDmService;
+import cloud.ciky.business.service.UserStudentService;
+import cloud.ciky.business.service.UserTeacherService;
 import cloud.ciky.core.annotation.Log;
 import cloud.ciky.core.annotation.RepeatSubmit;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
- * 学生表 前端控制器
+ * 学生表前端控制器
  * </p>
  *
  * @author ciky
@@ -39,6 +57,7 @@ public class BusinessUserController {
     private final UserDmService dmService;
     private final ClassStudentService classStudentService;
     private final RoomStudentService roomStudentService;
+
     @Operation(summary = "获取学生分页列表")
     @GetMapping("/student/list")
     public PageResult<StudentPageVO> listStudent(@ParameterObject StudentPageQuery query) {
@@ -65,6 +84,12 @@ public class BusinessUserController {
     public Result<UserStudentForm> getStudentForm(@PathVariable String id) {
         UserStudentForm form = studentService.getStudentForm(id);
         return Result.success(form);
+    }
+
+    @Operation(summary = "获取当前宿舍成员列表")
+    @GetMapping("/room/member/list")
+    public Result<List<RoomMemberVO>> listCurrentRoomMember() {
+        return Result.success(studentService.listCurrentRoomMember());
     }
 
     @Operation(summary = "获取教师表单")
@@ -182,5 +207,4 @@ public class BusinessUserController {
         boolean result = roomStudentService.saveRoomStudent(form);
         return Result.judge(result);
     }
-
 }

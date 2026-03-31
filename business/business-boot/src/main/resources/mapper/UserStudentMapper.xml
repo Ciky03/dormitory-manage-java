@@ -88,4 +88,26 @@
             and s.delflag = 0
     </select>
 
+    <!-- 获取当前宿舍成员列表 -->
+    <select id="selectCurrentRoomMemberList" resultType="cloud.ciky.business.model.vo.RoomMemberVO">
+        select rs.student_id as studentId,
+               s.real_name as studentName,
+               case when rs.student_id = #{currentStudentId} then true else false end as isCurrentUser,
+               a.bucket as avatarBucket,
+               a.path as avatarPath
+        from dm_business.room_student current_rs
+                 inner join dm_business.room_student rs on rs.room_id = current_rs.room_id
+            and rs.is_current = 1
+                 inner join dm_business.user_student s on s.id = rs.student_id
+            and s.delflag = 0
+                 left join dm_system.sys_user u on u.business_user_id = s.id
+            and u.user_type = ${@cloud.ciky.base.enums.UserTypeEnum@STUDENT.getValue()}
+            and u.delflag = 0
+                 left join dm_system.sys_attach a on a.id = u.avatar_attach_id
+            and a.delflag = 0
+        where current_rs.student_id = #{currentStudentId}
+          and current_rs.is_current = 1
+        order by rs.start_time asc, rs.create_time asc, rs.student_id asc
+    </select>
+
 </mapper>

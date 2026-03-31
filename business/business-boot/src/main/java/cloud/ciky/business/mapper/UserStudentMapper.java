@@ -3,10 +3,14 @@ package cloud.ciky.business.mapper;
 import cloud.ciky.business.model.entity.UserStudent;
 import cloud.ciky.business.model.form.UserStudentForm;
 import cloud.ciky.business.model.query.StudentPageQuery;
+import cloud.ciky.business.model.vo.RoomMemberVO;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -43,4 +47,16 @@ public interface UserStudentMapper extends BaseMapper<UserStudent> {
      * @return cloud.ciky.business.model.form.UserStudentForm
      */
     UserStudentForm selectStudentForm(String id);
+
+    /**
+     * <p>
+     * 获取当前宿舍成员列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/31 16:40
+     * @param currentStudentId 当前登录学生id
+     * @return java.util.List<cloud.ciky.business.model.vo.RoomMemberVO>
+     */
+    List<RoomMemberVO> selectCurrentRoomMemberList(@Param("currentStudentId") String currentStudentId);
 }

@@ -1,24 +1,21 @@
 package cloud.ciky.system.service.impl;
 
+import cloud.ciky.base.constant.AttachBucketConstants;
 import cloud.ciky.base.constant.RedisConstants;
 import cloud.ciky.base.exception.BusinessException;
 import cloud.ciky.file.model.dto.FileDTO;
 import cloud.ciky.file.model.vo.FileVO;
 import cloud.ciky.file.service.OssService;
 import cloud.ciky.security.util.SecurityUtils;
-import cloud.ciky.system.enums.AttachBucketEnum;
 import cloud.ciky.system.model.entity.SysAttach;
 import cloud.ciky.system.mapper.SysAttachMapper;
 import cloud.ciky.system.service.SysAttachService;
-import cn.hutool.core.annotation.scanner.FieldAnnotationScanner;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.TimeUnit;
@@ -66,7 +63,7 @@ public class SysAttachServiceImpl extends ServiceImpl<SysAttachMapper, SysAttach
         }
 
         // 头像临时URL缓存
-        if (bucket.equals(AttachBucketEnum.AVATAR.getValue())) {
+        if (bucket.equals(AttachBucketConstants.DM_SYSTEM_AVATAR)) {
             redisTemplate.opsForValue().set(RedisConstants.Attach.AVATAR + entity.getId(), fileDto.getUrl(), 3, TimeUnit.DAYS);
         }
 

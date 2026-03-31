@@ -3,9 +3,12 @@ package cloud.ciky.business.service;
 import cloud.ciky.business.model.entity.UserStudent;
 import cloud.ciky.business.model.form.UserStudentForm;
 import cloud.ciky.business.model.query.StudentPageQuery;
+import cloud.ciky.business.model.vo.RoomMemberVO;
 import cloud.ciky.business.model.vo.StudentPageVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -40,6 +43,17 @@ public interface UserStudentService extends IService<UserStudent> {
      * @return cloud.ciky.business.model.form.UserStudentForm
      */
     UserStudentForm getStudentForm(String id);
+
+    /**
+     * <p>
+     * 获取当前宿舍成员列表
+     * </p>
+     *
+     * @author ciky
+     * @since 2026/3/31 16:40
+     * @return java.util.List<cloud.ciky.business.model.vo.RoomMemberVO>
+     */
+    List<RoomMemberVO> listCurrentRoomMember();
 
     /**
      * <p>
